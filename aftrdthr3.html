@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AfterDither HTML — Lottie/TGS Export</title>
+  <title>AfterDither 3 — Lottie/TGS Export</title>
   <style>
     :root {
       color-scheme: dark;
@@ -25,206 +25,299 @@
       color: var(--text);
     }
     header {
-      padding: 18px 22px;
+      padding: 14px 22px;
       border-bottom: 1px solid var(--line);
       background: #0d0f14;
+      display: flex;
+      align-items: center;
+      gap: 14px;
     }
-    h1 { margin: 0 0 4px; font-size: 20px; }
-    header p { margin: 0; color: var(--muted); }
+    h1 { margin: 0; font-size: 18px; }
+    header p { margin: 0; color: var(--muted); font-size: 12px; }
     main {
       display: grid;
-      grid-template-columns: minmax(300px, 380px) 1fr;
-      height: calc(100vh - 82px);
+      grid-template-columns: minmax(280px, 340px) 1fr;
+      height: calc(100vh - 56px);
       overflow: hidden;
     }
     aside {
-      padding: 18px;
+      padding: 14px;
       background: var(--panel);
       border-right: 1px solid var(--line);
-      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
     .stage {
       min-width: 0;
-      display: grid;
-      grid-template-rows: auto 1fr;
+      display: flex;
+      flex-direction: column;
       background:
         linear-gradient(45deg, #171a22 25%, transparent 25%) 0 0 / 28px 28px,
         linear-gradient(45deg, transparent 75%, #171a22 75%) 0 0 / 28px 28px,
         linear-gradient(45deg, transparent 75%, #171a22 75%) 14px 14px / 28px 28px,
         linear-gradient(45deg, #171a22 25%, #101219 25%) 14px 14px / 28px 28px;
     }
-    .canvas-wrap {
-      display: grid;
-      place-items: center;
-      padding: 12px 24px 24px;
-      overflow: hidden;
+    .toolbar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      padding: 8px 12px;
+      background: rgba(13,15,20,.92);
+      border-bottom: 1px solid var(--line);
+      flex-wrap: wrap;
     }
-    canvas {
-      image-rendering: pixelated;
-      max-width: 100%;
-      max-height: calc(100vh - 170px);
-      background: transparent;
-      box-shadow: 0 16px 60px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,.1);
+    .tool-btn {
+      width: 32px; height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel-2);
+      color: var(--text);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      transition: background .15s, border-color .15s;
+      padding: 0;
+    }
+    .tool-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #061018;
+    }
+    .tool-btn:hover:not(.active) { background: var(--panel); }
+    .zoom-ctrl {
+      display: flex; gap: 4px; align-items: center; margin-left: 4px;
+    }
+    .zoom-label { color: var(--muted); font-size: 12px; min-width: 40px; text-align: center; }
+    .zoom-btn {
+      width: 24px; height: 24px; border: 1px solid var(--line); border-radius: 5px;
+      background: var(--panel-2); color: var(--text); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 14px; padding: 0;
+    }
+    .zoom-btn:hover { background: var(--panel); }
+    .multi-info {
+      margin-left: auto; color: var(--muted); font-size: 12px;
+      display: flex; gap: 10px; align-items: center;
+    }
+    .canvas-wrap {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
       cursor: crosshair;
     }
-    .row { margin: 0 0 15px; }
-    label { display: block; margin: 0 0 7px; font-weight: 650; }
-    .hint { color: var(--muted); font-size: 12px; margin-top: 5px; }
+    .canvas-wrap.pan-mode { cursor: grab; }
+    .canvas-wrap.pan-mode.panning { cursor: grabbing; }
+    #vpCanvas {
+      image-rendering: pixelated;
+      position: absolute;
+      top: 0; left: 0;
+      transform-origin: 0 0;
+    }
+    .row { margin: 0 0 12px; }
+    label { display: block; margin: 0 0 5px; font-weight: 650; font-size: 13px; }
+    .hint { color: var(--muted); font-size: 11px; margin-top: 4px; }
     input[type="file"], select, input[type="number"], input[type="text"] {
       width: 100%;
-      padding: 8px 10px;
+      padding: 7px 9px;
       color: var(--text);
       background: var(--panel-2);
       border: 1px solid var(--line);
       border-radius: 8px;
+      font-size: 13px;
     }
     input[type="range"] { width: 100%; }
     .range-line {
       display: grid;
-      grid-template-columns: 1fr 78px 38px;
-      gap: 10px;
+      grid-template-columns: 1fr 64px 26px;
+      gap: 6px;
       align-items: center;
     }
-    .reset-btn{padding:6px 0;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--text);cursor:pointer;}
+    .reset-btn {
+      width: 24px; height: 24px; border: 1px solid var(--line);
+      border-radius: 6px; background: var(--panel-2); color: var(--muted);
+      cursor: pointer; font-size: 13px; display: flex; align-items: center;
+      justify-content: center; padding: 0; flex-shrink: 0;
+      transition: background .15s;
+    }
+    .reset-btn:hover { background: var(--line); color: var(--text); }
+    .two-line {
+      display: grid; grid-template-columns: 1fr 1fr 26px; gap: 6px; align-items: center;
+    }
     .check-line {
-      display: flex;
-      gap: 9px;
-      align-items: flex-start;
-      color: var(--text);
+      display: flex; gap: 9px; align-items: flex-start; color: var(--text);
     }
     .check-line input { margin-top: 3px; }
     button {
-      width: 100%;
-      padding: 10px 12px;
-      margin: 6px 0 0;
-      border: 0;
-      border-radius: 9px;
-      color: #061018;
-      background: var(--accent);
-      font-weight: 800;
-      cursor: pointer;
+      width: 100%; padding: 9px 12px; margin: 5px 0 0;
+      border: 0; border-radius: 9px; color: #061018;
+      background: var(--accent); font-weight: 800; cursor: pointer; font-size: 13px;
     }
     button.secondary { background: #d6deef; }
-    button.small { padding: 8px 10px; font-size: 12px; }
-    .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    button.danger { background: var(--danger); }
+    button.small { padding: 7px 9px; font-size: 12px; }
+    .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
     button:disabled { cursor: not-allowed; filter: grayscale(1) brightness(.7); }
     .stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      padding: 14px;
-      border-top: 1px solid var(--line);
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+      padding: 10px 12px; border-top: 1px solid var(--line);
       background: rgba(13,15,20,.86);
     }
-    .stat {
-      min-width: 0;
-      padding: 10px;
-      border: 1px solid var(--line);
-      border-radius: 9px;
-      background: rgba(27,31,42,.9);
-    }
-    .stat b { display: block; font-size: 12px; color: var(--muted); font-weight: 600; }
-    .stat span { font-size: 16px; font-weight: 800; overflow-wrap: anywhere; }
+    .stat { min-width: 0; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; background: rgba(27,31,42,.9); }
+    .stat b { display: block; font-size: 11px; color: var(--muted); font-weight: 600; }
+    .stat span { font-size: 14px; font-weight: 800; overflow-wrap: anywhere; }
     .ok { color: var(--ok); }
     .warn { color: var(--danger); }
-    .note {
-      padding: 12px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: rgba(36,42,54,.8);
-      color: var(--muted);
+    .note { padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: rgba(36,42,54,.8); color: var(--muted); font-size: 12px; }
+    .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 12px 0 6px; font-weight: 700; }
+    hr { border: 0; border-top: 1px solid var(--line); margin: 12px 0; }
+
+    /* Multi-file grid overlay items */
+    .img-thumb {
+      position: absolute;
+      border: 1px solid rgba(255,255,255,.15);
+      cursor: crosshair;
+      overflow: hidden;
     }
-    @media (max-width: 860px) {
-      main { grid-template-columns: 1fr; }
-      aside { border-right: 0; border-bottom: 1px solid var(--line); }
+    .img-thumb .eye-btn {
+      position: absolute; top: 4px; right: 4px;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; cursor: pointer; z-index: 10;
+      transition: opacity .15s;
+    }
+    .img-thumb.excluded { opacity: .38; }
+    .img-thumb .thumb-name {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(0,0,0,.55); color: #fff; font-size: 10px;
+      padding: 2px 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>AfterDither HTML</h1>
-    <p>Быстрое canvas-превью, alpha-aware dithering, экспорт в Lottie JSON и gzipped .tgs.</p>
+    <div>
+      <h1>AfterDither 3</h1>
+      <p>Canvas dithering → Lottie/TGS/AE JSX export</p>
+    </div>
   </header>
 
   <main>
     <aside>
+      <!-- FILE -->
       <div class="row">
         <label for="file">Изображение</label>
-        <input id="file" type="file" accept="image/*" multiple />
-        <div class="check-line" style="margin-top:8px"><input id="multiFiles" type="checkbox" /><label for="multiFiles">мульти файлы</label></div>
-        <div class="hint">PNG с прозрачностью поддерживается: полностью прозрачные области не рисуются.</div>
+        <input id="file" type="file" accept="image/*" />
       </div>
+      <div class="row check-line">
+        <input id="multiMode" type="checkbox" />
+        <label for="multiMode" style="margin:0">Мульти файлы</label>
+      </div>
+      <div id="multiFileRow" class="row" style="display:none">
+        <input id="multiFile" type="file" accept="image/*" multiple />
+        <div class="hint">Загрузи несколько изображений — они заполнят вьюпорт сеткой.</div>
+      </div>
+
+      <hr/>
+
+      <!-- DITHER CONTROLS -->
+      <div class="section-title">Dither</div>
 
       <div class="row">
         <label>Pixel Size</label>
-        <div class="range-line"><input id="pixelSize" type="range" min="1" max="64" step="1" value="8" /><input id="pixelSizeNum" type="number" min="1" max="256" step="1" value="8" /><button class="reset-btn" data-reset="pixelSize">🔄</button></div>
-        <div class="hint">Размер одного dither-квадрата в пикселях выходного Lottie.</div>
+        <div class="range-line">
+          <input id="pixelSize" type="range" min="1" max="64" step="1" value="8" />
+          <input id="pixelSizeNum" type="number" min="1" max="256" step="1" value="8" />
+          <button class="reset-btn" data-reset="pixelSize" title="Сброс">🔄</button>
+        </div>
       </div>
 
       <div class="row">
         <label>Pixel Gap</label>
-        <div class="range-line"><input id="pixelGap" type="range" min="0" max="32" step="1" value="0" /><input id="pixelGapNum" type="number" min="0" max="64" step="1" value="0" /><button class="reset-btn" data-reset="pixelGap">🔄</button></div>
-        <div class="hint">Отступ между dither-клетками в пикселях предпросмотра и экспорта.</div>
+        <div class="range-line">
+          <input id="pixelGap" type="range" min="0" max="32" step="1" value="0" />
+          <input id="pixelGapNum" type="number" min="0" max="64" step="1" value="0" />
+          <button class="reset-btn" data-reset="pixelGap" title="Сброс">🔄</button>
+        </div>
       </div>
 
       <div class="row">
         <label>Brightness</label>
-        <div class="range-line"><input id="brightness" type="range" min="-100" max="100" step="1" value="0" /><input id="brightnessNum" type="number" min="-100" max="100" step="1" value="0" /><button class="reset-btn" data-reset="brightness">🔄</button></div>
+        <div class="range-line">
+          <input id="brightness" type="range" min="-100" max="100" step="1" value="0" />
+          <input id="brightnessNum" type="number" min="-100" max="100" step="1" value="0" />
+          <button class="reset-btn" data-reset="brightness" title="Сброс">🔄</button>
+        </div>
       </div>
 
       <div class="row">
         <label>Contrast</label>
-        <div class="range-line"><input id="contrast" type="range" min="-254" max="254" step="1" value="0" /><input id="contrastNum" type="number" min="-254" max="254" step="1" value="0" /><button class="reset-btn" data-reset="contrast">🔄</button></div>
+        <div class="range-line">
+          <input id="contrast" type="range" min="-254" max="254" step="1" value="0" />
+          <input id="contrastNum" type="number" min="-254" max="254" step="1" value="0" />
+          <button class="reset-btn" data-reset="contrast" title="Сброс">🔄</button>
+        </div>
       </div>
 
       <div class="row">
         <label>Threshold</label>
-        <div class="range-line"><input id="threshold" type="range" min="0" max="100" step="1" value="50" /><input id="thresholdNum" type="number" min="0" max="100" step="1" value="50" /><button class="reset-btn" data-reset="threshold">🔄</button></div>
+        <div class="range-line">
+          <input id="threshold" type="range" min="0" max="100" step="1" value="50" />
+          <input id="thresholdNum" type="number" min="0" max="100" step="1" value="50" />
+          <button class="reset-btn" data-reset="threshold" title="Сброс">🔄</button>
+        </div>
       </div>
+
+      <hr/>
+
+      <div class="section-title">Размер и позиция</div>
 
       <div class="row">
         <label>Preview / export size</label>
-        <div class="range-line"><input id="previewWidth" type="number" min="16" max="4096" step="1" value="512" /><input id="previewHeight" type="number" min="16" max="4096" step="1" value="512" /><button class="reset-btn" data-reset="previewSize">🔄</button></div>
-        <div class="hint">Размер окна превью и Lottie/TGS композиции. По умолчанию 512×512.</div>
+        <div class="two-line">
+          <input id="previewWidth" type="number" min="16" max="4096" step="1" value="512" placeholder="W" />
+          <input id="previewHeight" type="number" min="16" max="4096" step="1" value="512" placeholder="H" />
+          <button class="reset-btn" data-reset="previewSize" title="Сброс">🔄</button>
+        </div>
+        <div class="hint">Размер Lottie/TGS. По умолчанию 512×512.</div>
       </div>
 
       <div class="row">
         <label>Image position X / Y</label>
-        <div class="range-line"><input id="imageX" type="number" min="-4096" max="4096" step="1" value="0" /><input id="imageY" type="number" min="-4096" max="4096" step="1" value="0" /><button class="reset-btn" data-reset="imagePos">🔄</button></div>
-        <div class="hint">Положение исходной картинки внутри превью перед дизерингом. Можно также перетаскивать картинку мышью, когда ручное редактирование выключено.</div>
+        <div class="two-line">
+          <input id="imageX" type="number" min="-4096" max="4096" step="1" value="0" placeholder="X" />
+          <input id="imageY" type="number" min="-4096" max="4096" step="1" value="0" placeholder="Y" />
+          <button class="reset-btn" data-reset="imagePos" title="Сброс">🔄</button>
+        </div>
       </div>
 
       <div class="row">
         <label>Image scale</label>
-        <div class="range-line"><input id="imageScale" type="range" min="0.05" max="16" step="0.05" value="1" /><input id="imageScaleNum" type="number" min="0.01" max="64" step="0.05" value="1" /><button class="reset-btn" data-reset="imageScale">🔄</button></div>
-        <div class="hint">Масштаб исходной картинки внутри превью.</div>
+        <div class="range-line">
+          <input id="imageScale" type="range" min="0.05" max="16" step="0.05" value="1" />
+          <input id="imageScaleNum" type="number" min="0.01" max="64" step="0.05" value="1" />
+          <button class="reset-btn" data-reset="imageScale" title="Сброс">🔄</button>
+        </div>
       </div>
 
-      
-      <div class="row">
-        <label>Viewport zoom / tool</label>
-        <div class="range-line"><input id="viewportZoom" type="range" min="0.25" max="4" step="0.05" value="1" /><input id="viewportZoomNum" type="number" min="0.25" max="8" step="0.05" value="1" /></div>
-        <div class="button-grid" style="margin-top:6px"><button id="toolArrow" class="secondary small">↖ Стрелка</button><button id="toolHand" class="secondary small">✋ Рука</button></div>
-      </div>
+      <hr/>
+
+      <div class="section-title">Вид</div>
 
       <div class="row check-line">
         <input id="showSource" type="checkbox" checked />
-        <label for="showSource">Показывать исходную картинку под дизерингом</label>
+        <label for="showSource" style="margin:0">Показывать исходник под дизерингом</label>
       </div>
-
       <div class="row check-line">
         <input id="useTransformScale" type="checkbox" checked />
-        <label for="useTransformScale">Use image transform scale for Pixel Size</label>
+        <label for="useTransformScale" style="margin:0">Use image transform scale for Pixel Size</label>
       </div>
-
       <div class="row check-line">
         <input id="transparentOnly" type="checkbox" checked />
-        <label for="transparentOnly">Игнорировать прозрачные пиксели</label>
+        <label for="transparentOnly" style="margin:0">Игнорировать прозрачные пиксели</label>
       </div>
-
       <div class="row check-line">
         <input id="mergeDiagonal" type="checkbox" checked />
-        <label for="mergeDiagonal">Сшивать касания углами в непрерывные paths где возможно</label>
+        <label for="mergeDiagonal" style="margin:0">Сшивать касания углами</label>
       </div>
 
       <div class="row">
@@ -235,52 +328,83 @@
           <option value="black">Чёрный</option>
           <option value="gray">Серый</option>
           <option value="blue">Синий</option>
-          <option value="transparent">Прозрачный/тёмный UI</option>
+          <option value="transparent">Прозрачный</option>
         </select>
       </div>
+
+      <hr/>
+
+      <div class="section-title">Кисть / ластик</div>
 
       <div class="row check-line">
         <input id="eraserEnabled" type="checkbox" />
-        <label for="eraserEnabled">Ручное редактирование: контур показывает, где сотрутся или дорисуются клетки</label>
+        <label for="eraserEnabled" style="margin:0">Ручное редактирование</label>
       </div>
-
       <div class="row">
-        <label for="editTool">Edit tool</label>
+        <label for="editTool">Инструмент</label>
         <select id="editTool">
           <option value="erase" selected>Ластик — стирать квадраты</option>
-          <option value="draw">Карандаш — дорисовывать квадраты</option>
+          <option value="draw">Карандаш — рисовать квадраты</option>
         </select>
       </div>
-
       <div class="row">
         <label>Brush Size</label>
-        <div class="range-line"><input id="eraserSize" type="range" min="1" max="20" step="1" value="1" /><input id="eraserSizeNum" type="number" min="1" max="64" step="1" value="1" /></div>
-        <div class="hint">Размер квадратной кисти в актуальных dither-клетках. После изменения параметров дизеринга ручные правки сбрасываются.</div>
+        <div class="range-line">
+          <input id="eraserSize" type="range" min="1" max="20" step="1" value="1" />
+          <input id="eraserSizeNum" type="number" min="1" max="64" step="1" value="1" />
+          <button class="reset-btn" data-reset="eraserSize" title="Сброс">🔄</button>
+        </div>
+      </div>
+      <div class="row button-grid">
+        <button id="undoErase" class="secondary small" disabled>Undo change</button>
+        <button id="undoAction" class="secondary small" disabled>Undo action</button>
+        <button id="clearErase" class="secondary small" disabled>Clear edits</button>
+        <button id="centerImage" class="secondary small" disabled>Center image</button>
       </div>
 
-      <div class="row button-grid">
-        <button id="undoErase" class="secondary small" disabled>Undo 1 change</button>
-        <button id="undoAction" class="secondary small" disabled>Undo full 1 action</button>
-        <button id="clearErase" class="secondary small" disabled>Clear edits</button>
-        <button id="centerImage" class="secondary small" disabled>Center image / reset X Y</button>
-      </div>
+      <hr/>
+
+      <div class="section-title">Экспорт</div>
 
       <div class="row">
-        <label>FPS / Duration</label>
-        <div class="range-line"><input id="fps" type="number" min="1" max="120" step="1" value="30" /><input id="duration" type="number" min="1" max="300" step="1" value="60" /></div>
-        <div class="hint">Duration — количество кадров в статичном Lottie.</div>
+        <label>FPS / Duration кадров</label>
+        <div class="two-line">
+          <input id="fps" type="number" min="1" max="120" step="1" value="30" />
+          <input id="duration" type="number" min="1" max="300" step="1" value="60" />
+          <span></span>
+        </div>
       </div>
 
       <button id="downloadJson" disabled>Скачать .json Lottie</button>
       <button id="downloadTgs" class="secondary" disabled>Скачать .tgs gzip</button>
-      <button id="copyAeJsx" class="secondary" disabled>Copy AE JSX для импорта</button>
+      <button id="copyAeJsx" class="secondary" disabled>Copy AE JSX</button>
       <button id="downloadAeJsx" class="secondary" disabled>Скачать AE JSX</button>
-      <button id="downloadMultiAeJsx" class="secondary" disabled>Скачать multi AE JSX</button>
-      <div class="note row" id="note">Загрузи изображение, затем крути настройки — превью и расчёт веса обновляются автоматически.</div>
+      <button id="downloadMultiJsx" class="secondary" disabled style="display:none">Мульти-экспорт всех JSX</button>
+      <div class="note row" id="note">Загрузи изображение, затем крути настройки — превью обновляется автоматически.</div>
     </aside>
 
     <section class="stage">
-      <div class="canvas-wrap" id="viewportWrap"><canvas id="preview" width="512" height="512"></canvas></div>
+      <!-- TOOLBAR -->
+      <div class="toolbar">
+        <button class="tool-btn active" id="toolArrow" title="Выделение / рисование (Arrow)">↖</button>
+        <button class="tool-btn" id="toolHand" title="Рука — перетаскивать вьюпорт [Пробел]">✋</button>
+        <div style="width:1px;height:24px;background:var(--line);margin:0 4px;"></div>
+        <div class="zoom-ctrl">
+          <button class="zoom-btn" id="zoomOut" title="Отдалить">−</button>
+          <span class="zoom-label" id="zoomLabel">100%</span>
+          <button class="zoom-btn" id="zoomIn" title="Приблизить">+</button>
+          <button class="zoom-btn" id="zoomReset" title="Сбросить зум" style="width:auto;padding:0 6px;font-size:12px;">1:1</button>
+        </div>
+        <div class="multi-info" id="multiInfo" style="display:none">
+          <span id="multiCount">0 файлов</span>
+          <span id="multiTgsWeight"></span>
+        </div>
+      </div>
+
+      <div class="canvas-wrap" id="canvasWrap">
+        <canvas id="vpCanvas"></canvas>
+      </div>
+
       <div class="stats">
         <div class="stat"><b>Сетка</b><span id="gridStat">—</span></div>
         <div class="stat"><b>Чёрных клеток</b><span id="blackStat">—</span></div>
@@ -298,6 +422,23 @@
 
   var TRANSPARENT_ALPHA_EPSILON = 1;
   var TELEGRAM_TGS_LIMIT = 64 * 1024;
+
+  // Default values map
+  var DEFAULTS = {
+    pixelSize: 8,
+    pixelGap: 0,
+    brightness: 0,
+    contrast: 0,
+    threshold: 50,
+    previewWidth: 512,
+    previewHeight: 512,
+    imageX: 0,
+    imageY: 0,
+    imageScale: 1,
+    eraserSize: 1
+  };
+
+  // Single-image state
   var state = {
     image: null,
     imageName: 'afterdither',
@@ -314,18 +455,45 @@
     currentStroke: null,
     pointer: { visible: false, col: 0, row: 0 },
     dragImage: null,
-    multiImages: [],
-    activeTool: 'arrow',
-    viewPan: {x:0,y:0},
-    viewZoom:1,
-    panDrag:null,
-    spaceHand:false
+    timer: null
   };
+
+  // Multi-file state
+  var multi = {
+    files: [],   // [{file, img, name, sourceCanvas, eraseMask, eraseHistory, lottieText, aeJsxText, tgsBlob, excluded}]
+    layout: [],  // [{x,y,w,h,imgW,imgH}] — positions on vpCanvas
+    active: -1   // index of image being edited
+  };
+
+  // Viewport pan/zoom state
+  var vp = {
+    scale: 1,
+    ox: 0,
+    oy: 0,
+    panning: false,
+    spaceDown: false,
+    lastX: 0,
+    lastY: 0
+  };
+
+  var currentTool = 'arrow'; // 'arrow' | 'hand'
 
   var el = {
     file: document.getElementById('file'),
-    preview: document.getElementById('preview'),
-    viewportWrap: document.getElementById('viewportWrap'),
+    multiMode: document.getElementById('multiMode'),
+    multiFile: document.getElementById('multiFile'),
+    multiFileRow: document.getElementById('multiFileRow'),
+    vpCanvas: document.getElementById('vpCanvas'),
+    canvasWrap: document.getElementById('canvasWrap'),
+    toolArrow: document.getElementById('toolArrow'),
+    toolHand: document.getElementById('toolHand'),
+    zoomIn: document.getElementById('zoomIn'),
+    zoomOut: document.getElementById('zoomOut'),
+    zoomReset: document.getElementById('zoomReset'),
+    zoomLabel: document.getElementById('zoomLabel'),
+    multiInfo: document.getElementById('multiInfo'),
+    multiCount: document.getElementById('multiCount'),
+    multiTgsWeight: document.getElementById('multiTgsWeight'),
     pixelSize: document.getElementById('pixelSize'),
     pixelSizeNum: document.getElementById('pixelSizeNum'),
     pixelGap: document.getElementById('pixelGap'),
@@ -361,12 +529,7 @@
     downloadTgs: document.getElementById('downloadTgs'),
     copyAeJsx: document.getElementById('copyAeJsx'),
     downloadAeJsx: document.getElementById('downloadAeJsx'),
-    downloadMultiAeJsx: document.getElementById('downloadMultiAeJsx'),
-    multiFiles: document.getElementById('multiFiles'),
-    viewportZoom: document.getElementById('viewportZoom'),
-    viewportZoomNum: document.getElementById('viewportZoomNum'),
-    toolArrow: document.getElementById('toolArrow'),
-    toolHand: document.getElementById('toolHand'),
+    downloadMultiJsx: document.getElementById('downloadMultiJsx'),
     note: document.getElementById('note'),
     gridStat: document.getElementById('gridStat'),
     blackStat: document.getElementById('blackStat'),
@@ -376,25 +539,18 @@
     limitStat: document.getElementById('limitStat')
   };
 
+  // ── helpers ──────────────────────────────────────────────────────────────
+
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
   function formatBytes(bytes) {
     if (!bytes && bytes !== 0) return '—';
     if (bytes < 1024) return bytes + ' B';
-    return (bytes / 1024).toFixed(bytes < 1024 * 1024 ? 1 : 2) + (bytes < 1024 * 1024 ? ' KB' : ' MB');
+    return (bytes / 1024).toFixed(bytes < 1048576 ? 1 : 2) + (bytes < 1048576 ? ' KB' : ' MB');
   }
-  function baseName(name) { return String(name || 'afterdither').replace(/\.[^.]+$/, '').replace(/[^a-z0-9_-]+/gi, '_') || 'afterdither'; }
 
-  function syncRange(range, number) {
-    function fromRange() { number.value = range.value; scheduleUpdate(); }
-    function fromNumber() {
-      var value = clamp(parseFloat(number.value) || parseFloat(range.value), parseFloat(number.min), parseFloat(number.max));
-      number.value = value;
-      range.value = clamp(value, parseFloat(range.min), parseFloat(range.max));
-      scheduleUpdate();
-    }
-    range.addEventListener('input', fromRange);
-    number.addEventListener('change', fromNumber);
-    number.addEventListener('input', fromNumber);
+  function baseName(name) {
+    return String(name || 'afterdither').replace(/\.[^.]+$/, '').replace(/[^a-z0-9_-]+/gi, '_') || 'afterdither';
   }
 
   function readNumber(value, fallback) {
@@ -424,6 +580,56 @@
     };
   }
 
+  // ── syncRange (FIXED: also listen 'input' on number so typing applies immediately) ─
+  function syncRange(range, number) {
+    function fromRange() {
+      number.value = range.value;
+      scheduleUpdate();
+    }
+    function fromNumber() {
+      var value = clamp(parseFloat(number.value) || 0, parseFloat(number.min || -Infinity), parseFloat(number.max || Infinity));
+      number.value = value;
+      if (range) range.value = clamp(value, parseFloat(range.min), parseFloat(range.max));
+      resetEdits();
+      scheduleUpdate();
+    }
+    if (range) range.addEventListener('input', fromRange);
+    // FIX: listen both 'input' and 'change' on number field so typing works live
+    number.addEventListener('input', fromNumber);
+    number.addEventListener('change', fromNumber);
+  }
+
+  // ── reset buttons ─────────────────────────────────────────────────────────
+  document.querySelectorAll('.reset-btn[data-reset]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var key = btn.getAttribute('data-reset');
+      switch(key) {
+        case 'pixelSize':
+          el.pixelSize.value = DEFAULTS.pixelSize; el.pixelSizeNum.value = DEFAULTS.pixelSize; break;
+        case 'pixelGap':
+          el.pixelGap.value = DEFAULTS.pixelGap; el.pixelGapNum.value = DEFAULTS.pixelGap; break;
+        case 'brightness':
+          el.brightness.value = DEFAULTS.brightness; el.brightnessNum.value = DEFAULTS.brightness; break;
+        case 'contrast':
+          el.contrast.value = DEFAULTS.contrast; el.contrastNum.value = DEFAULTS.contrast; break;
+        case 'threshold':
+          el.threshold.value = DEFAULTS.threshold; el.thresholdNum.value = DEFAULTS.threshold; break;
+        case 'previewSize':
+          el.previewWidth.value = DEFAULTS.previewWidth; el.previewHeight.value = DEFAULTS.previewHeight; break;
+        case 'imagePos':
+          el.imageX.value = DEFAULTS.imageX; el.imageY.value = DEFAULTS.imageY; break;
+        case 'imageScale':
+          el.imageScale.value = DEFAULTS.imageScale; el.imageScaleNum.value = DEFAULTS.imageScale; break;
+        case 'eraserSize':
+          el.eraserSize.value = DEFAULTS.eraserSize; el.eraserSizeNum.value = DEFAULTS.eraserSize; break;
+      }
+      resetEdits();
+      scheduleUpdate();
+    });
+  });
+
+  // ── dithering core ────────────────────────────────────────────────────────
+
   function adjustedLuma(r, g, b, brightness, contrast) {
     var y = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
     y += brightness / 100;
@@ -431,57 +637,47 @@
     return clamp(factor * (y - 0.5) + 0.5, 0, 1);
   }
 
-  function ditherImage(opts) {
-    var source = state.sourceCanvas;
-    var width = source.width;
-    var height = source.height;
+  function ditherSourceCanvas(sourceCanvas, opts) {
+    var width = sourceCanvas.width;
+    var height = sourceCanvas.height;
     var outputWidth = opts.previewWidth;
     var outputHeight = opts.previewHeight;
     var visualCell = opts.useTransformScale ? opts.pixelSize : opts.pixelSize * opts.imageScale;
     visualCell = Math.max(1, visualCell);
     var cols = Math.ceil(outputWidth / visualCell);
     var rows = Math.ceil(outputHeight / visualCell);
-    var ctx = source.getContext('2d', { willReadFrequently: true });
+    var ctx = sourceCanvas.getContext('2d', { willReadFrequently: true });
     var imageData = ctx.getImageData(0, 0, width, height).data;
-    var values = [];
-    var alphaMask = [];
-    var black = [];
-    var blackCount = 0;
+    var values = [], alphaMask = [], black = [], blackCount = 0;
 
     for (var r = 0; r < rows; r++) {
-      values[r] = [];
-      alphaMask[r] = [];
-      black[r] = [];
+      values[r] = []; alphaMask[r] = []; black[r] = [];
       for (var c = 0; c < cols; c++) {
         var ox = c * visualCell + visualCell / 2;
         var oy = r * visualCell + visualCell / 2;
         var sxFloat = (ox - opts.imageX) / opts.imageScale;
         var syFloat = (oy - opts.imageY) / opts.imageScale;
         var inside = sxFloat >= 0 && syFloat >= 0 && sxFloat < width && syFloat < height;
-        var opaque = false;
-        var luma = 1;
+        var opaque = false, luma = 1;
         if (inside) {
           var sx = Math.min(width - 1, Math.max(0, Math.floor(sxFloat)));
           var sy = Math.min(height - 1, Math.max(0, Math.floor(syFloat)));
-          var index = (sy * width + sx) * 4;
-          var alpha = imageData[index + 3];
+          var idx = (sy * width + sx) * 4;
+          var alpha = imageData[idx + 3];
           opaque = !opts.transparentOnly || alpha > TRANSPARENT_ALPHA_EPSILON;
-          if (opaque) luma = adjustedLuma(imageData[index], imageData[index + 1], imageData[index + 2], opts.brightness, opts.contrast);
+          if (opaque) luma = adjustedLuma(imageData[idx], imageData[idx + 1], imageData[idx + 2], opts.brightness, opts.contrast);
         }
-        alphaMask[r][c] = opaque;
-        values[r][c] = luma;
-        black[r][c] = false;
+        alphaMask[r][c] = opaque; values[r][c] = luma; black[r][c] = false;
       }
     }
-
     for (r = 0; r < rows; r++) {
       for (c = 0; c < cols; c++) {
         if (!alphaMask[r][c]) continue;
-        var oldPixel = clamp(values[r][c], 0, 1);
-        var newPixel = oldPixel < opts.threshold ? 0 : 1;
-        black[r][c] = newPixel === 0;
+        var oldP = clamp(values[r][c], 0, 1);
+        var newP = oldP < opts.threshold ? 0 : 1;
+        black[r][c] = newP === 0;
         if (black[r][c]) blackCount++;
-        var err = oldPixel - newPixel;
+        var err = oldP - newP;
         if (c + 1 < cols && alphaMask[r][c + 1]) values[r][c + 1] += err * 7 / 16;
         if (r + 1 < rows) {
           if (c > 0 && alphaMask[r + 1][c - 1]) values[r + 1][c - 1] += err * 3 / 16;
@@ -490,61 +686,81 @@
         }
       }
     }
-
-    return {
-      black: black, cols: cols, rows: rows, width: outputWidth, height: outputHeight,
-      cell: visualCell, gap: opts.pixelGap, blackCount: blackCount,
-      imageX: opts.imageX, imageY: opts.imageY, imageScale: opts.imageScale
-    };
+    return { black: black, cols: cols, rows: rows, width: outputWidth, height: outputHeight, cell: visualCell, gap: opts.pixelGap, blackCount: blackCount, imageX: opts.imageX, imageY: opts.imageY, imageScale: opts.imageScale };
   }
+
+  function ditherImage(opts) {
+    return ditherSourceCanvas(state.sourceCanvas, opts);
+  }
+
+  // ── erase mask ────────────────────────────────────────────────────────────
 
   function makeEmptyEraseMask(rows, cols) {
     var mask = [];
     for (var r = 0; r < rows; r++) { mask[r] = []; for (var c = 0; c < cols; c++) mask[r][c] = null; }
     return mask;
   }
-  function ensureEraseMask(data) {
-    if (!state.eraseMask || state.eraseMask.length !== data.rows || !state.eraseMask[0] || state.eraseMask[0].length !== data.cols) {
-      state.eraseMask = makeEmptyEraseMask(data.rows, data.cols); state.eraseHistory = [];
+
+  function ensureEraseMask(data, stateObj) {
+    stateObj = stateObj || state;
+    if (!stateObj.eraseMask || stateObj.eraseMask.length !== data.rows || !stateObj.eraseMask[0] || stateObj.eraseMask[0].length !== data.cols) {
+      stateObj.eraseMask = makeEmptyEraseMask(data.rows, data.cols);
+      stateObj.eraseHistory = [];
     }
   }
-  function applyEraseMask(data) {
-    ensureEraseMask(data);
+
+  function applyEraseMask(data, stateObj) {
+    stateObj = stateObj || state;
+    ensureEraseMask(data, stateObj);
     var blackCount = 0;
-    for (var r = 0; r < data.rows; r++) for (var c = 0; c < data.cols; c++) {
-      if (state.eraseMask[r][c] !== null) data.black[r][c] = state.eraseMask[r][c] === 1;
-      if (data.black[r][c]) blackCount++;
+    for (var r = 0; r < data.rows; r++) {
+      for (var c = 0; c < data.cols; c++) {
+        if (stateObj.eraseMask[r][c] !== null) data.black[r][c] = stateObj.eraseMask[r][c] === 1;
+        if (data.black[r][c]) blackCount++;
+      }
     }
     data.blackCount = blackCount;
   }
+
   function resetEdits() {
     state.eraseMask = null; state.eraseHistory = []; state.actionHistory = []; state.currentStroke = null;
     el.undoErase.disabled = true; el.undoAction.disabled = true; el.clearErase.disabled = true;
   }
 
+  // ── lottie / jsx builders ─────────────────────────────────────────────────
+
   function keyFor(c, r) { return c + ',' + r; }
+
   function collectComponents(black, includeDiagonal) {
-    var rows = black.length, cols = rows ? black[0].length : 0, seen = Object.create(null), comps = [];
+    var rows = black.length, cols = rows ? black[0].length : 0;
+    var seen = Object.create(null), comps = [];
     var dirs = includeDiagonal ? [[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]] : [[0,-1],[-1,0],[1,0],[0,1]];
-    for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
-      var k = keyFor(c, r); if (!black[r][c] || seen[k]) continue;
-      var stack = [{ c: c, r: r }], cells = []; seen[k] = true;
-      while (stack.length) {
-        var cur = stack.pop(); cells.push(cur);
-        for (var d = 0; d < dirs.length; d++) {
-          var nc = cur.c + dirs[d][0], nr = cur.r + dirs[d][1], nk = keyFor(nc, nr);
-          if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && black[nr][nc] && !seen[nk]) { seen[nk] = true; stack.push({ c: nc, r: nr }); }
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
+        var k = keyFor(c, r);
+        if (!black[r][c] || seen[k]) continue;
+        var stack = [{ c: c, r: r }], cells = [];
+        seen[k] = true;
+        while (stack.length) {
+          var cur = stack.pop(); cells.push(cur);
+          for (var d = 0; d < dirs.length; d++) {
+            var nc = cur.c + dirs[d][0], nr = cur.r + dirs[d][1], nk = keyFor(nc, nr);
+            if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && black[nr][nc] && !seen[nk]) { seen[nk] = true; stack.push({ c: nc, r: nr }); }
+          }
         }
+        comps.push(cells);
       }
-      comps.push(cells);
     }
     return comps;
   }
+
   function splitFourConnected(cells) {
-    var cellSet = Object.create(null); cells.forEach(function (cell) { cellSet[keyFor(cell.c, cell.r)] = true; });
+    var cellSet = Object.create(null);
+    cells.forEach(function(cell) { cellSet[keyFor(cell.c, cell.r)] = true; });
     var seen = Object.create(null), islands = [], dirs = [[0,-1],[-1,0],[1,0],[0,1]];
     for (var i = 0; i < cells.length; i++) {
-      var k = keyFor(cells[i].c, cells[i].r); if (seen[k]) continue;
+      var k = keyFor(cells[i].c, cells[i].r);
+      if (seen[k]) continue;
       var stack = [cells[i]], island = []; seen[k] = true;
       while (stack.length) {
         var cur = stack.pop(); island.push(cur);
@@ -560,150 +776,94 @@
 
   function edgeKey(a, b) { return a.x + ',' + a.y + '>' + b.x + ',' + b.y; }
   function reverseEdgeKey(a, b) { return b.x + ',' + b.y + '>' + a.x + ',' + a.y; }
+
   function addEdge(edges, a, b) {
     var rev = reverseEdgeKey(a, b);
-    if (edges[rev]) delete edges[rev]; else edges[edgeKey(a, b)] = { a: a, b: b };
+    if (edges[rev]) delete edges[rev];
+    else edges[edgeKey(a, b)] = { a: a, b: b };
   }
 
   function islandToPaths(island, cellSize) {
     var edges = Object.create(null);
-    island.forEach(function (cell) {
+    island.forEach(function(cell) {
       var c = cell.c, r = cell.r;
-      addEdge(edges, { x: c, y: r }, { x: c + 1, y: r });
-      addEdge(edges, { x: c + 1, y: r }, { x: c + 1, y: r + 1 });
-      addEdge(edges, { x: c + 1, y: r + 1 }, { x: c, y: r + 1 });
-      addEdge(edges, { x: c, y: r + 1 }, { x: c, y: r });
+      addEdge(edges, {x:c,y:r}, {x:c+1,y:r});
+      addEdge(edges, {x:c+1,y:r}, {x:c+1,y:r+1});
+      addEdge(edges, {x:c+1,y:r+1}, {x:c,y:r+1});
+      addEdge(edges, {x:c,y:r+1}, {x:c,y:r});
     });
-
-    var vertexEdges = Object.create(null);
-    Object.keys(edges).forEach(function (key) {
-      var e = edges[key], startKey = e.a.x + ',' + e.a.y;
-      if (!vertexEdges[startKey]) vertexEdges[startKey] = [];
-      vertexEdges[startKey].push(e);
+    var outgoing = Object.create(null);
+    var keys = Object.keys(edges);
+    keys.forEach(function(ek) {
+      var start = edges[ek].a.x + ',' + edges[ek].a.y;
+      if (!outgoing[start]) outgoing[start] = [];
+      outgoing[start].push(ek);
     });
-
-    var visited = Object.create(null), paths = [];
-    Object.keys(edges).forEach(function (key) {
-      if (visited[key]) return;
-      var path = [], current = edges[key];
-      while (current) {
-        var ck = edgeKey(current.a, current.b);
-        if (visited[ck]) break;
-        visited[ck] = true;
-        path.push({ x: current.a.x * cellSize, y: current.a.y * cellSize });
-        var nextList = vertexEdges[current.b.x + ',' + current.b.y] || [], next = null;
-        for (var i = 0; i < nextList.length; i++) {
-          var nk = edgeKey(nextList[i].a, nextList[i].b);
-          if (!visited[nk]) { next = nextList[i]; break; }
-        }
-        current = next;
+    var used = Object.create(null), paths = [];
+    keys.forEach(function(startKey) {
+      if (used[startKey]) return;
+      var e = edges[startKey];
+      var start = e.a.x + ',' + e.a.y;
+      var current = e, verts = [];
+      while (current && !used[edgeKey(current.a, current.b)]) {
+        var ck = edgeKey(current.a, current.b); used[ck] = true;
+        verts.push([current.a.x * cellSize, current.a.y * cellSize]);
+        var nextStart = current.b.x + ',' + current.b.y;
+        var candidates = outgoing[nextStart] || [];
+        current = null;
+        for (var j = candidates.length - 1; j >= 0; j--) { if (!used[candidates[j]]) { current = edges[candidates[j]]; break; } }
+        if (nextStart === start && !current) break;
       }
-      if (path.length) paths.push(path);
+      if (verts.length >= 3) paths.push(verts);
     });
     return paths;
   }
 
-  function pathsToLottieShapes(paths) {
-    return paths.map(function (path, idx) {
-      var vertices = path.map(function (p) { return [p.x, p.y]; });
-      return { ty: 'sh', ix: idx + 1, ks: { a: 0, k: { i: vertices.map(function () { return [0, 0]; }), o: vertices.map(function () { return [0, 0]; }), v: vertices, c: true } }, nm: 'Path ' + (idx + 1) };
-    });
+  function shapePath(vertices) {
+    var z = vertices.map(function() { return [0,0]; });
+    return { ty: 'sh', ks: { a: 0, k: { i: z, o: z, v: vertices, c: true } } };
   }
 
-  function buildLottie(data, opts) {
-    var comps = collectComponents(data.black, opts.mergeDiagonal), groups = [];
-    comps.forEach(function (component, i) {
-      var islands = opts.mergeDiagonal ? splitFourConnected(component) : [component], groupItems = [];
-      islands.forEach(function (island) {
-        var paths = islandToPaths(island, data.cell);
-        pathsToLottieShapes(paths).forEach(function (shape) { groupItems.push(shape); });
-      });
+  function buildLottie(data, opts, imgName) {
+    var components = collectComponents(data.black, opts.mergeDiagonal);
+    var groups = [];
+    for (var i = 0; i < components.length; i++) {
+      var groupItems = [];
+      var islands = opts.mergeDiagonal ? [components[i]] : splitFourConnected(components[i]);
+      for (var j = 0; j < islands.length; j++) {
+        var paths = islandToPaths(islands[j], data.cell);
+        for (var p = 0; p < paths.length; p++) groupItems.push(shapePath(paths[p]));
+      }
       if (groupItems.length) {
-        groupItems.push({ ty: 'fl', c: { a: 0, k: [0, 0, 0, 1] }, o: { a: 0, k: 100 }, r: 1, bm: 0, nm: 'Fill 1' });
-        groups.push({ ty: 'gr', nm: 'Cluster ' + (i + 1), it: groupItems });
-      }
-    });
-
-    return {
-      v: '5.7.4', fr: opts.fps, ip: 0, op: opts.duration, w: data.width, h: data.height, nm: 'AfterDither_' + state.imageName, ddd: 0, assets: [],
-      layers: [{ ddd: 0, ind: 1, ty: 4, nm: 'Black Dither', sr: 1, ks: { o: { a: 0, k: 100 }, r: { a: 0, k: 0 }, p: { a: 0, k: [0, 0, 0] }, a: { a: 0, k: [0, 0, 0] }, s: { a: 0, k: [100, 100, 100] } }, ao: 0, shapes: groups, ip: 0, op: opts.duration, st: 0, bm: 0 }]
-    };
-  }
-
-  function drawPreviewBackground(ctx, width, height) {
-    var bg = el.previewBg.value;
-    ctx.clearRect(0, 0, width, height);
-    if (bg === 'transparent') return;
-    if (bg === 'checker') {
-      var tile = Math.max(8, Math.round(Math.min(width, height) / 32));
-      for (var y = 0; y < height; y += tile) for (var x = 0; x < width; x += tile) {
-        ctx.fillStyle = ((x / tile + y / tile) % 2 === 0) ? '#f3f3f3' : '#bfc6d1';
-        ctx.fillRect(x, y, tile, tile);
-      }
-      return;
-    }
-    ctx.fillStyle = bg === 'white' ? '#fff' : bg === 'black' ? '#000' : bg === 'blue' ? '#3178ff' : '#8b8f99';
-    ctx.fillRect(0, 0, width, height);
-  }
-
-  function drawEditCursor(ctx, data) {
-    if (!el.eraserEnabled.checked || !state.pointer.visible || !data) return;
-    var size = options().eraserSize, half = Math.floor(size / 2);
-    var x = (state.pointer.col - half) * data.cell, y = (state.pointer.row - half) * data.cell;
-    var w = size * data.cell, h = size * data.cell;
-    ctx.save();
-    ctx.lineWidth = Math.max(1, Math.min(4, data.cell / 5));
-    ctx.setLineDash([Math.max(3, data.cell / 2), Math.max(3, data.cell / 3)]);
-    ctx.strokeStyle = el.editTool.value === 'draw' ? '#00ff66' : '#ff3355';
-    ctx.strokeRect(x + 0.5, y + 0.5, w, h);
-    ctx.setLineDash([]);
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(x + 1.5, y + 1.5, Math.max(0, w - 2), Math.max(0, h - 2));
-    ctx.restore();
-  }
-
-  function drawPreview(data) {
-    var canvas = el.preview;
-    canvas.width = data.width; canvas.height = data.height;
-    var ctx = canvas.getContext('2d');
-    drawPreviewBackground(ctx, canvas.width, canvas.height);
-    if (state.image && options().showSource) {
-      ctx.save(); ctx.globalAlpha = 0.45; ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(state.image, data.imageX, data.imageY, state.sourceCanvas.width * data.imageScale, state.sourceCanvas.height * data.imageScale);
-      ctx.restore();
-    }
-    ctx.fillStyle = (el.previewBg.value === 'black') ? '#fff' : '#000';
-    for (var r = 0; r < data.rows; r++) for (var c = 0; c < data.cols; c++) {
-      if (data.black[r][c]) {
-        var gap = Math.min(data.gap, Math.max(0, data.cell - 1));
-        var size = Math.max(1, data.cell - gap), offset = gap / 2;
-        ctx.fillRect(c * data.cell + offset, r * data.cell + offset, size, size);
+        groupItems.push({ ty: 'fl', c: {a:0,k:[0,0,0,1]}, o: {a:0,k:100}, r: 1 });
+        groupItems.push({ ty: 'tr', p:{a:0,k:[0,0]}, a:{a:0,k:[0,0]}, s:{a:0,k:[100,100]}, r:{a:0,k:0}, o:{a:0,k:100}, sk:{a:0,k:0}, sa:{a:0,k:0} });
+        groups.push({ ty: 'gr', nm: 'Cluster ' + (i+1), it: groupItems });
       }
     }
-    drawEditCursor(ctx, data);
+    return { v:'5.7.4', fr:opts.fps, ip:0, op:opts.duration, w:data.width, h:data.height, nm:'AfterDither_'+(imgName||state.imageName), ddd:0, assets:[], layers:[{ ddd:0, ind:1, ty:4, nm:'Black Dither', sr:1, ks:{o:{a:0,k:100},r:{a:0,k:0},p:{a:0,k:[0,0,0]},a:{a:0,k:[0,0,0]},s:{a:0,k:[100,100,100]}}, ao:0, shapes:groups, ip:0, op:opts.duration, st:0, bm:0 }] };
   }
 
-  function jsString(value) { return JSON.stringify(String(value)); }
+  function jsString(v) { return JSON.stringify(String(v)); }
 
-  function buildAeJsx(data, opts) {
-    var lottie = JSON.parse(state.lottieText || JSON.stringify(buildLottie(data, opts)));
+  function buildAeJsx(data, opts, imgName, frameIndex, totalFrames) {
+    var lottie = JSON.parse(JSON.stringify(buildLottie(data, opts, imgName)));
     var shapesJson = JSON.stringify(lottie.layers[0].shapes || []);
+    var layerName = imgName + (frameIndex !== undefined ? '_' + frameIndex : '');
     return '(function(){\n' +
       'var comp = app.project && app.project.activeItem;\n' +
       'if (!(comp instanceof CompItem)) { alert("Open a comp before running AfterDither import."); return; }\n' +
       'var data = ' + shapesJson + ';\n' +
-      'var w = ' + JSON.stringify(data.width) + ', h = ' + JSON.stringify(data.height) + ';\n' +
+      'var w = ' + data.width + ', h = ' + data.height + ';\n' +
       'function makeShape(k){ var s = new Shape(); s.vertices = k.v; s.inTangents = k.i; s.outTangents = k.o; s.closed = !!k.c; return s; }\n' +
-      'app.beginUndoGroup("Import AfterDither HTML Shapes");\n' +
-      'var layer = comp.layers.addShape(); layer.name = ' + jsString('AfterDither_HTML_' + state.imageName) + ';\n' +
+      'app.beginUndoGroup("Import AfterDither ' + layerName + '");\n' +
+      'var layer = comp.layers.addShape(); layer.name = ' + jsString('AfterDither_' + layerName) + ';\n' +
       'var tr = layer.property("ADBE Transform Group"); tr.property("ADBE Anchor Point").setValue([w/2,h/2]); tr.property("ADBE Position").setValue([comp.width/2,comp.height/2]);\n' +
       'var root = layer.property("ADBE Root Vectors Group");\n' +
       'for (var i=0; i<data.length; i++) {\n' +
-      '  var g = root.addProperty("ADBE Vector Group"); g.name = data[i].nm || ("Cluster " + (i+1));\n' +
+      '  var g = root.addProperty("ADBE Vector Group"); g.name = data[i].nm || ("Cluster "+(i+1));\n' +
       '  var vg = g.property("ADBE Vectors Group");\n' +
-      '  for (var j=0; j<data[i].it.length; j++) { var item = data[i].it[j]; if (item.ty === "sh") { var p = vg.addProperty("ADBE Vector Shape - Group"); p.property("ADBE Vector Shape").setValue(makeShape(item.ks.k)); } }\n' +
-      '  var fill = vg.addProperty("ADBE Vector Graphic - Fill"); fill.property("ADBE Vector Fill Color").setValue([0,0,0]); fill.property("ADBE Vector Fill Opacity").setValue(100);\n' +
+      '  for (var j=0; j<data[i].it.length; j++) { var item=data[i].it[j]; if(item.ty==="sh"){ var p=vg.addProperty("ADBE Vector Shape - Group"); p.property("ADBE Vector Shape").setValue(makeShape(item.ks.k)); } }\n' +
+      '  var fill=vg.addProperty("ADBE Vector Graphic - Fill"); fill.property("ADBE Vector Fill Color").setValue([0,0,0]); fill.property("ADBE Vector Fill Opacity").setValue(100);\n' +
       '}\n' +
       'app.endUndoGroup();\n' +
       '}());\n';
@@ -715,12 +875,280 @@
     return new Response(stream).blob();
   }
 
+  // ── drawing ───────────────────────────────────────────────────────────────
+
+  function drawPreviewBackground(ctx, width, height) {
+    var bg = el.previewBg.value;
+    ctx.clearRect(0, 0, width, height);
+    if (bg === 'transparent') return;
+    if (bg === 'checker') {
+      var tile = Math.max(8, Math.round(Math.min(width, height) / 32));
+      for (var y = 0; y < height; y += tile) {
+        for (var x = 0; x < width; x += tile) {
+          ctx.fillStyle = ((x/tile + y/tile) % 2 === 0) ? '#f3f3f3' : '#bfc6d1';
+          ctx.fillRect(x, y, tile, tile);
+        }
+      }
+      return;
+    }
+    ctx.fillStyle = bg === 'white' ? '#fff' : bg === 'black' ? '#000' : bg === 'blue' ? '#3178ff' : '#8b8f99';
+    ctx.fillRect(0, 0, width, height);
+  }
+
+  function drawDitherData(ctx, data, srcCanvas, srcImg, offsetX, offsetY, opts) {
+    offsetX = offsetX || 0; offsetY = offsetY || 0;
+    ctx.save();
+    ctx.translate(offsetX, offsetY);
+    drawPreviewBackground(ctx, data.width, data.height);
+    if (srcImg && opts.showSource) {
+      ctx.save(); ctx.globalAlpha = 0.45; ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(srcImg, data.imageX, data.imageY, srcCanvas.width * data.imageScale, srcCanvas.height * data.imageScale);
+      ctx.restore();
+    }
+    ctx.fillStyle = '#000';
+    if (el.previewBg.value === 'black') ctx.fillStyle = '#fff';
+    for (var r = 0; r < data.rows; r++) {
+      for (var c = 0; c < data.cols; c++) {
+        if (data.black[r][c]) {
+          var gap = Math.min(data.gap, Math.max(0, data.cell - 1));
+          var sz = Math.max(1, data.cell - gap);
+          ctx.fillRect(c * data.cell + gap/2, r * data.cell + gap/2, sz, sz);
+        }
+      }
+    }
+    ctx.restore();
+  }
+
+  function drawEditCursor(ctx, data, offsetX, offsetY) {
+    if (!el.eraserEnabled.checked || !state.pointer.visible || !data) return;
+    offsetX = offsetX || 0; offsetY = offsetY || 0;
+    var size = options().eraserSize, half = Math.floor(size / 2);
+    var x = (state.pointer.col - half) * data.cell + offsetX;
+    var y = (state.pointer.row - half) * data.cell + offsetY;
+    var w = size * data.cell, h = size * data.cell;
+    ctx.save();
+    ctx.lineWidth = Math.max(1, Math.min(4, data.cell / 5));
+    ctx.setLineDash([Math.max(3, data.cell/2), Math.max(3, data.cell/3)]);
+    ctx.strokeStyle = el.editTool.value === 'draw' ? '#00ff66' : '#ff3355';
+    ctx.strokeRect(x+.5, y+.5, w, h);
+    ctx.setLineDash([]);
+    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1;
+    ctx.strokeRect(x+1.5, y+1.5, Math.max(0,w-2), Math.max(0,h-2));
+    ctx.restore();
+  }
+
+  // ── viewport rendering ────────────────────────────────────────────────────
+
+  function getWrapSize() {
+    var r = el.canvasWrap.getBoundingClientRect();
+    return { w: r.width, h: r.height };
+  }
+
+  function applyVpTransform() {
+    el.vpCanvas.style.transform = 'translate(' + vp.ox + 'px,' + vp.oy + 'px) scale(' + vp.scale + ')';
+    el.zoomLabel.textContent = Math.round(vp.scale * 100) + '%';
+  }
+
+  function centerVp() {
+    var ws = getWrapSize();
+    var cw = el.vpCanvas.width, ch = el.vpCanvas.height;
+    vp.ox = (ws.w - cw * vp.scale) / 2;
+    vp.oy = (ws.h - ch * vp.scale) / 2;
+    applyVpTransform();
+  }
+
+  // SINGLE-IMAGE mode
+  function renderSingle(data) {
+    el.vpCanvas.width = data.width;
+    el.vpCanvas.height = data.height;
+    var ctx = el.vpCanvas.getContext('2d');
+    drawDitherData(ctx, data, state.sourceCanvas, state.image, 0, 0, options());
+    drawEditCursor(ctx, data, 0, 0);
+  }
+
+  // MULTI-IMAGE mode: lay images in a grid filling a virtual canvas
+  function computeMultiLayout(opts) {
+    var n = multi.files.length;
+    if (!n) return;
+    var cols = Math.ceil(Math.sqrt(n));
+    var rows = Math.ceil(n / cols);
+    var cellW = opts.previewWidth, cellH = opts.previewHeight;
+    var padding = 8;
+    var totalW = cols * cellW + (cols + 1) * padding;
+    var totalH = rows * cellH + (rows + 1) * padding;
+    el.vpCanvas.width = totalW;
+    el.vpCanvas.height = totalH;
+    multi.layout = [];
+    for (var i = 0; i < n; i++) {
+      var col = i % cols, row = Math.floor(i / cols);
+      multi.layout.push({
+        x: padding + col * (cellW + padding),
+        y: padding + row * (cellH + padding),
+        w: cellW, h: cellH
+      });
+    }
+  }
+
+  function renderMulti() {
+    if (!multi.files.length) return;
+    var opts = options();
+    computeMultiLayout(opts);
+    var ctx = el.vpCanvas.getContext('2d');
+    ctx.clearRect(0, 0, el.vpCanvas.width, el.vpCanvas.height);
+    ctx.fillStyle = 'rgba(0,0,0,.35)';
+    ctx.fillRect(0, 0, el.vpCanvas.width, el.vpCanvas.height);
+
+    for (var i = 0; i < multi.files.length; i++) {
+      var mf = multi.files[i];
+      var layout = multi.layout[i];
+      // clip to cell
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(layout.x, layout.y, layout.w, layout.h);
+      ctx.clip();
+      // adapt opts for cell
+      var cellOpts = Object.assign({}, opts, {
+        previewWidth: layout.w,
+        previewHeight: layout.h,
+        imageX: Math.round((layout.w - mf.sourceCanvas.width * opts.imageScale) / 2),
+        imageY: Math.round((layout.h - mf.sourceCanvas.height * opts.imageScale) / 2)
+      });
+      var data = ditherSourceCanvas(mf.sourceCanvas, cellOpts);
+      applyEraseMask(data, mf);
+      mf.lastData = data;
+      drawDitherData(ctx, data, mf.sourceCanvas, mf.img, layout.x, layout.y, opts);
+      // border
+      ctx.strokeStyle = (i === multi.active) ? 'rgba(114,214,255,.8)' : 'rgba(255,255,255,.12)';
+      ctx.lineWidth = (i === multi.active) ? 2 : 1;
+      ctx.strokeRect(layout.x, layout.y, layout.w, layout.h);
+      // excluded overlay
+      if (mf.excluded) {
+        ctx.fillStyle = 'rgba(0,0,0,.5)';
+        ctx.fillRect(layout.x, layout.y, layout.w, layout.h);
+        ctx.fillStyle = 'rgba(255,120,90,.7)';
+        ctx.font = 'bold 12px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillText('скрыто', layout.x + layout.w/2, layout.y + layout.h/2);
+      }
+      // eye icon
+      ctx.fillStyle = 'rgba(0,0,0,.55)';
+      ctx.beginPath();
+      ctx.arc(layout.x + layout.w - 14, layout.y + 14, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = mf.excluded ? 'rgba(255,100,80,.9)' : 'rgba(255,255,255,.85)';
+      ctx.font = '13px system-ui';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(mf.excluded ? '🚫' : '👁', layout.x + layout.w - 14, layout.y + 14);
+      ctx.textBaseline = 'alphabetic';
+      // name badge
+      ctx.fillStyle = 'rgba(0,0,0,.6)';
+      ctx.fillRect(layout.x, layout.y + layout.h - 18, layout.w, 18);
+      ctx.fillStyle = '#dde'; ctx.font = '10px system-ui'; ctx.textAlign = 'left';
+      ctx.fillText((i+1) + '. ' + mf.name, layout.x + 4, layout.y + layout.h - 5);
+      ctx.restore();
+    }
+    // cursor for active image
+    if (multi.active >= 0) {
+      var af = multi.files[multi.active];
+      if (af && af.lastData) {
+        var al = multi.layout[multi.active];
+        drawEditCursor(ctx, af.lastData, al.x, al.y);
+      }
+    }
+    // update multi info
+    el.multiCount.textContent = multi.files.length + ' файл(ов)';
+    updateMultiTgsWeight();
+  }
+
+  function updateMultiTgsWeight() {
+    var total = 0;
+    multi.files.forEach(function(mf) { if (mf.tgsBlob && !mf.excluded) total += mf.tgsBlob.size; });
+    el.multiTgsWeight.textContent = total ? 'TGS всего: ' + formatBytes(total) : '';
+  }
+
+  // ── schedule update ───────────────────────────────────────────────────────
+
+  function scheduleUpdate() {
+    window.clearTimeout(state.timer);
+    state.timer = window.setTimeout(update, 80);
+  }
+
+  function update() {
+    var token = ++state.updateToken;
+    var isMulti = el.multiMode.checked;
+    if (isMulti) {
+      if (!multi.files.length) return;
+      renderMulti();
+      // Compute tgs for each
+      var opts = options();
+      var pending = 0;
+      multi.files.forEach(function(mf) {
+        if (!mf.img) return;
+        var cellOpts = Object.assign({}, opts, {
+          previewWidth: opts.previewWidth, previewHeight: opts.previewHeight,
+          imageX: Math.round((opts.previewWidth - mf.sourceCanvas.width * opts.imageScale) / 2),
+          imageY: Math.round((opts.previewHeight - mf.sourceCanvas.height * opts.imageScale) / 2)
+        });
+        var data = ditherSourceCanvas(mf.sourceCanvas, cellOpts);
+        applyEraseMask(data, mf);
+        var lottie = buildLottie(data, opts, mf.name);
+        var text = JSON.stringify(lottie);
+        mf.lottieText = text;
+        mf.aeJsxText = buildAeJsx(data, opts, mf.name, multi.files.indexOf(mf) + 1);
+        pending++;
+        gzipString(text).then(function(blob) {
+          mf.tgsBlob = blob;
+          pending--;
+          if (pending === 0) updateMultiTgsWeight();
+        });
+      });
+      el.downloadMultiJsx.disabled = false;
+      el.note.textContent = 'Мульти-режим: ' + multi.files.length + ' изображений обработано.';
+      return;
+    }
+    if (!state.image) return;
+    el.note.textContent = 'Считаю…';
+    window.setTimeout(function() {
+      if (token !== state.updateToken) return;
+      try {
+        var opts = options();
+        var data = ditherImage(opts);
+        applyEraseMask(data, state);
+        var lottie = buildLottie(data, opts, state.imageName);
+        var text = JSON.stringify(lottie);
+        state.lottieText = text;
+        state.aeJsxText = buildAeJsx(data, opts, state.imageName);
+        renderSingle(data);
+        gzipString(text).then(function(blob) {
+          if (token !== state.updateToken) return;
+          state.previewData = data;
+          state.tgsBlob = blob;
+          state.tgsBytes = blob ? blob.size : 0;
+          updateStats(data, text, blob);
+          el.downloadJson.disabled = false;
+          el.downloadTgs.disabled = !blob;
+          el.copyAeJsx.disabled = false;
+          el.downloadAeJsx.disabled = false;
+          el.undoErase.disabled = state.eraseHistory.length === 0;
+          el.undoAction.disabled = state.actionHistory.length === 0;
+          el.clearErase.disabled = state.eraseHistory.length === 0;
+          el.centerImage.disabled = !state.image;
+          el.note.textContent = blob ? 'Готово.' : 'Готово (нет CompressionStream).';
+        });
+      } catch(err) {
+        el.note.textContent = 'Ошибка: ' + err.message;
+        console.error(err);
+      }
+    }, 0);
+  }
+
   function updateStats(data, lottieText, gzipBlob) {
     el.gridStat.textContent = data.cols + ' × ' + data.rows;
     el.blackStat.textContent = String(data.blackCount);
     var shapeGroups = JSON.parse(lottieText).layers[0].shapes || [];
     var pathCount = 0;
-    shapeGroups.forEach(function (group) { (group.it || []).forEach(function (item) { if (item.ty === 'sh') pathCount++; }); });
+    shapeGroups.forEach(function(g) { (g.it||[]).forEach(function(item){ if(item.ty==='sh') pathCount++; }); });
     el.groupStat.textContent = shapeGroups.length + ' / ' + pathCount;
     el.jsonStat.textContent = formatBytes(new Blob([lottieText]).size);
     if (gzipBlob) {
@@ -729,62 +1157,150 @@
       el.limitStat.className = gzipBlob.size <= TELEGRAM_TGS_LIMIT ? 'ok' : 'warn';
     } else {
       el.tgsStat.textContent = 'нет CompressionStream';
-      el.limitStat.textContent = '—';
-      el.limitStat.className = '';
+      el.limitStat.textContent = '—'; el.limitStat.className = '';
     }
   }
 
-  function scheduleUpdate() { window.clearTimeout(state.timer); state.timer = window.setTimeout(update, 80); }
+  // ── load image ────────────────────────────────────────────────────────────
 
-  function update() {
-    var token = ++state.updateToken;
-    if (!state.image) return;
-    el.note.textContent = 'Считаю превью и вес TGS…';
-    window.setTimeout(function () {
-      if (token !== state.updateToken) return;
-      try {
-        var opts = options(), data = ditherImage(opts);
-        applyEraseMask(data);
-        var lottie = buildLottie(data, opts), text = JSON.stringify(lottie);
-        state.lottieText = text; state.aeJsxText = buildAeJsx(data, opts); drawPreview(data);
-        gzipString(text).then(function (blob) {
-          if (token !== state.updateToken) return;
-          state.previewData = data; state.lottieText = text; state.aeJsxText = buildAeJsx(data, opts);
-          state.tgsBlob = blob; state.tgsBytes = blob ? blob.size : 0;
-          updateStats(data, text, blob);
-          el.downloadJson.disabled = false; el.downloadTgs.disabled = !blob; el.copyAeJsx.disabled = false; el.downloadAeJsx.disabled = false;
-          el.undoErase.disabled = state.eraseHistory.length === 0; el.undoAction.disabled = state.actionHistory.length === 0; el.clearErase.disabled = state.eraseHistory.length === 0;
-          el.centerImage.disabled = !state.image;
-          el.note.textContent = blob ? 'Готово. TGS вес пересчитан по gzip.' : 'Готово. Для .tgs нужен браузер с CompressionStream (Chrome/Edge/Safari новые версии).';
-        });
-      } catch (err) { el.note.textContent = 'Ошибка: ' + err.message; console.error(err); }
-    }, 0);
+  function loadImage(file, callback) {
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function() { URL.revokeObjectURL(url); callback(img); };
+    img.onerror = function() { URL.revokeObjectURL(url); };
+    img.src = url;
   }
 
-  function loadImage(file) {
-    var url = URL.createObjectURL(file), img = new Image();
-    img.onload = function () {
-      URL.revokeObjectURL(url);
-      state.image = img; state.imageName = baseName(file.name);
-      state.sourceCanvas.width = img.naturalWidth || img.width; state.sourceCanvas.height = img.naturalHeight || img.height;
+  function loadSingleImage(file) {
+    loadImage(file, function(img) {
+      state.image = img;
+      state.imageName = baseName(file.name);
+      state.sourceCanvas.width = img.naturalWidth || img.width;
+      state.sourceCanvas.height = img.naturalHeight || img.height;
       state.sourceCanvas.getContext('2d').clearRect(0, 0, state.sourceCanvas.width, state.sourceCanvas.height);
       state.sourceCanvas.getContext('2d').drawImage(img, 0, 0);
       var fit = Math.min(1, options().previewWidth / state.sourceCanvas.width, options().previewHeight / state.sourceCanvas.height);
       el.imageScale.value = fit; el.imageScaleNum.value = fit.toFixed(2);
       el.imageX.value = Math.round((options().previewWidth - state.sourceCanvas.width * fit) / 2);
       el.imageY.value = Math.round((options().previewHeight - state.sourceCanvas.height * fit) / 2);
-      resetEdits(); scheduleUpdate();
-    };
-    img.onerror = function () { URL.revokeObjectURL(url); el.note.textContent = 'Не удалось загрузить изображение.'; };
-    img.src = url;
+      resetEdits();
+      centerVp();
+      scheduleUpdate();
+    });
+  }
+
+  function loadMultiImages(files) {
+    var arr = Array.from(files);
+    var loaded = 0;
+    arr.forEach(function(file) {
+      loadImage(file, function(img) {
+        var sc = document.createElement('canvas');
+        sc.width = img.naturalWidth || img.width;
+        sc.height = img.naturalHeight || img.height;
+        sc.getContext('2d').drawImage(img, 0, 0);
+        multi.files.push({ file: file, img: img, name: baseName(file.name), sourceCanvas: sc, eraseMask: null, eraseHistory: [], lottieText: '', aeJsxText: '', tgsBlob: null, excluded: false, lastData: null });
+        loaded++;
+        if (loaded === arr.length) { centerVp(); scheduleUpdate(); }
+      });
+    });
   }
 
   function downloadBlob(blob, filename) {
-    var url = URL.createObjectURL(blob), a = document.createElement('a');
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
     a.href = url; a.download = filename;
     document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
   }
+
+  // ── pointer cell helpers ──────────────────────────────────────────────────
+
+  // Convert wrap-relative coords to canvas coords
+  function wrapToCanvas(wx, wy) {
+    return { x: (wx - vp.ox) / vp.scale, y: (wy - vp.oy) / vp.scale };
+  }
+
+  function pointerCell(evt) {
+    if (!state.previewData) return null;
+    var rect = el.canvasWrap.getBoundingClientRect();
+    var cc = wrapToCanvas(evt.clientX - rect.left, evt.clientY - rect.top);
+    return { col: Math.floor(cc.x / state.previewData.cell), row: Math.floor(cc.y / state.previewData.cell) };
+  }
+
+  function pointerCellMulti(evt) {
+    var rect = el.canvasWrap.getBoundingClientRect();
+    var cc = wrapToCanvas(evt.clientX - rect.left, evt.clientY - rect.top);
+    for (var i = 0; i < multi.layout.length; i++) {
+      var l = multi.layout[i];
+      if (cc.x >= l.x && cc.x < l.x + l.w && cc.y >= l.y && cc.y < l.y + l.h) {
+        var mf = multi.files[i];
+        if (!mf || !mf.lastData) continue;
+        var lx = cc.x - l.x, ly = cc.y - l.y;
+        return { imgIdx: i, col: Math.floor(lx / mf.lastData.cell), row: Math.floor(ly / mf.lastData.cell) };
+      }
+    }
+    return null;
+  }
+
+  function checkEyeClick(evt) {
+    var rect = el.canvasWrap.getBoundingClientRect();
+    var cc = wrapToCanvas(evt.clientX - rect.left, evt.clientY - rect.top);
+    for (var i = 0; i < multi.layout.length; i++) {
+      var l = multi.layout[i];
+      var ex = l.x + l.w - 14, ey = l.y + 14;
+      var dx = cc.x - ex, dy = cc.y - ey;
+      if (Math.sqrt(dx*dx + dy*dy) <= 11) return i;
+    }
+    return -1;
+  }
+
+  function editAtEventSingle(evt) {
+    if (!el.eraserEnabled.checked || !state.previewData) return;
+    var pos = pointerCell(evt);
+    if (!pos) return;
+    state.pointer.visible = true; state.pointer.col = pos.col; state.pointer.row = pos.row;
+    var size = options().eraserSize, half = Math.floor(size / 2);
+    var value = el.editTool.value === 'draw' ? 1 : 0;
+    ensureEraseMask(state.previewData, state);
+    var changed = [];
+    for (var r = pos.row - half; r < pos.row - half + size; r++) {
+      for (var c = pos.col - half; c < pos.col - half + size; c++) {
+        if (r >= 0 && r < state.previewData.rows && c >= 0 && c < state.previewData.cols && state.eraseMask[r][c] !== value) {
+          changed.push([r, c, state.eraseMask[r][c]]); state.eraseMask[r][c] = value;
+        }
+      }
+    }
+    if (changed.length) {
+      state.eraseHistory.push(changed);
+      if (state.currentStroke) state.currentStroke.push(changed);
+      scheduleUpdate();
+    } else renderSingle(state.previewData);
+  }
+
+  function editAtEventMulti(evt) {
+    if (!el.eraserEnabled.checked) return;
+    var pos = pointerCellMulti(evt);
+    if (!pos) return;
+    var mf = multi.files[pos.imgIdx];
+    if (!mf || !mf.lastData) return;
+    multi.active = pos.imgIdx;
+    mf.pointer = { visible: true, col: pos.col, row: pos.row };
+    var size = options().eraserSize, half = Math.floor(size / 2);
+    var value = el.editTool.value === 'draw' ? 1 : 0;
+    ensureEraseMask(mf.lastData, mf);
+    var changed = [];
+    for (var r = pos.row - half; r < pos.row - half + size; r++) {
+      for (var c = pos.col - half; c < pos.col - half + size; c++) {
+        if (r >= 0 && r < mf.lastData.rows && c >= 0 && c < mf.lastData.cols && mf.eraseMask[r][c] !== value) {
+          changed.push([r, c, mf.eraseMask[r][c]]); mf.eraseMask[r][c] = value;
+        }
+      }
+    }
+    if (changed.length) { mf.eraseHistory.push(changed); scheduleUpdate(); }
+    else renderMulti();
+  }
+
+  // ── input wiring ──────────────────────────────────────────────────────────
 
   syncRange(el.pixelSize, el.pixelSizeNum);
   syncRange(el.pixelGap, el.pixelGapNum);
@@ -794,92 +1310,169 @@
   syncRange(el.imageScale, el.imageScaleNum);
   syncRange(el.eraserSize, el.eraserSizeNum);
 
-  [el.pixelSize, el.pixelSizeNum, el.pixelGap, el.pixelGapNum, el.brightness, el.brightnessNum, el.contrast, el.contrastNum, el.threshold, el.thresholdNum, el.previewWidth, el.previewHeight, el.imageX, el.imageY, el.imageScale, el.imageScaleNum, el.transparentOnly, el.useTransformScale].forEach(function (control) {
-    control.addEventListener('input', resetEdits); control.addEventListener('change', resetEdits);
+  // number-only controls that also trigger resetEdits+update
+  [el.previewWidth, el.previewHeight, el.imageX, el.imageY, el.fps, el.duration].forEach(function(ctrl) {
+    ctrl.addEventListener('input', function() { resetEdits(); scheduleUpdate(); });
+    ctrl.addEventListener('change', function() { resetEdits(); scheduleUpdate(); });
   });
-  [el.transparentOnly, el.mergeDiagonal, el.previewBg, el.showSource, el.useTransformScale, el.previewWidth, el.previewHeight, el.imageX, el.imageY, el.imageScale, el.imageScaleNum, el.eraserSize, el.eraserSizeNum, el.fps, el.duration, el.pixelGap, el.pixelGapNum].forEach(function (control) {
-    control.addEventListener('input', scheduleUpdate); control.addEventListener('change', scheduleUpdate);
+  [el.transparentOnly, el.mergeDiagonal, el.previewBg, el.showSource, el.useTransformScale].forEach(function(ctrl) {
+    ctrl.addEventListener('change', function() { scheduleUpdate(); });
   });
-  el.editTool.addEventListener('change', function () { if (state.previewData) drawPreview(state.previewData); });
-  el.eraserEnabled.addEventListener('change', function () { if (state.previewData) drawPreview(state.previewData); });
 
-  function applyViewportTransform(){
-    el.preview.style.transformOrigin = '0 0';
-    el.preview.style.transform = 'translate(' + state.viewPan.x + 'px,' + state.viewPan.y + 'px) scale(' + state.viewZoom + ')';
-  }
-  function currentTool(){ return state.spaceHand ? 'hand' : state.activeTool; }
-  function setToolButtons(){
-    el.toolArrow.style.outline = currentTool()==='arrow' ? '2px solid #72d6ff' : '';
-    el.toolHand.style.outline = currentTool()==='hand' ? '2px solid #72d6ff' : '';
-  }
+  el.editTool.addEventListener('change', function() { if (state.previewData) renderSingle(state.previewData); });
+  el.eraserEnabled.addEventListener('change', function() { if (state.previewData) renderSingle(state.previewData); });
 
-  function pointerCell(evt) {
-    if (!state.previewData) return null;
-    var rect = el.preview.getBoundingClientRect();
-    var x = (evt.clientX - rect.left) * (el.preview.width / rect.width);
-    var y = (evt.clientY - rect.top) * (el.preview.height / rect.height);
-    return { col: Math.floor(x / state.previewData.cell), row: Math.floor(y / state.previewData.cell) };
-  }
+  // multi-mode toggle
+  el.multiMode.addEventListener('change', function() {
+    var m = el.multiMode.checked;
+    el.multiFileRow.style.display = m ? '' : 'none';
+    el.multiInfo.style.display = m ? '' : 'none';
+    el.downloadMultiJsx.style.display = m ? '' : 'none';
+    scheduleUpdate();
+  });
 
-  function editAtEvent(evt) {
-    if (!el.eraserEnabled.checked || !state.previewData) return;
-    var pos = pointerCell(evt); if (!pos) return;
-    state.pointer.visible = true; state.pointer.col = pos.col; state.pointer.row = pos.row;
-    var size = options().eraserSize, half = Math.floor(size / 2), value = el.editTool.value === 'draw' ? 1 : 0;
-    ensureEraseMask(state.previewData);
-    var changed = [];
-    for (var r = pos.row - half; r < pos.row - half + size; r++) for (var c = pos.col - half; c < pos.col - half + size; c++) {
-      if (r >= 0 && r < state.previewData.rows && c >= 0 && c < state.previewData.cols && state.eraseMask[r][c] !== value) {
-        changed.push([r, c, state.eraseMask[r][c]]); state.eraseMask[r][c] = value;
-      }
-    }
-    if (changed.length) { state.eraseHistory.push(changed); if (state.currentStroke) state.currentStroke.push(changed); scheduleUpdate(); }
-    else drawPreview(state.previewData);
-  }
-
-  el.preview.addEventListener('pointerdown', function (evt) {
-    el.preview.setPointerCapture(evt.pointerId);
-    if (currentTool()==='hand') { state.panDrag={id:evt.pointerId,x:evt.clientX,y:evt.clientY,startX:state.viewPan.x,startY:state.viewPan.y}; return; }
-    if (el.eraserEnabled.checked) { state.currentStroke = []; editAtEvent(evt); return; }
-    if (state.image) {
-      state.dragImage = { pointerId: evt.pointerId, startClientX: evt.clientX, startClientY: evt.clientY, startX: parseFloat(el.imageX.value) || 0, startY: parseFloat(el.imageY.value) || 0 };
+  el.multiFile.addEventListener('change', function() {
+    if (el.multiFile.files && el.multiFile.files.length) {
+      multi.files = [];
+      loadMultiImages(el.multiFile.files);
     }
   });
-  el.preview.addEventListener('pointermove', function (evt) {
-    if (state.panDrag && state.panDrag.id===evt.pointerId){
-      state.viewPan.x = state.panDrag.startX + (evt.clientX-state.panDrag.x);
-      state.viewPan.y = state.panDrag.startY + (evt.clientY-state.panDrag.y);
-      applyViewportTransform();
+
+  // ── canvas wrap pointer events ────────────────────────────────────────────
+
+  el.canvasWrap.addEventListener('pointerdown', function(evt) {
+    el.canvasWrap.setPointerCapture(evt.pointerId);
+    var isMulti = el.multiMode.checked;
+
+    // Hand tool / spacebar
+    if (currentTool === 'hand' || vp.spaceDown) {
+      vp.panning = true; vp.lastX = evt.clientX; vp.lastY = evt.clientY;
+      el.canvasWrap.classList.add('panning');
       return;
     }
-    if (state.dragImage && state.dragImage.pointerId === evt.pointerId && !el.eraserEnabled.checked && currentTool()==='arrow') {
-      var rect = el.preview.getBoundingClientRect(), scaleX = el.preview.width / rect.width, scaleY = el.preview.height / rect.height;
-      el.imageX.value = Math.round(state.dragImage.startX + (evt.clientX - state.dragImage.startClientX) * scaleX);
-      el.imageY.value = Math.round(state.dragImage.startY + (evt.clientY - state.dragImage.startClientY) * scaleY);
+
+    // Check eye icon in multi mode
+    if (isMulti) {
+      var eyeIdx = checkEyeClick(evt);
+      if (eyeIdx >= 0) { multi.files[eyeIdx].excluded = !multi.files[eyeIdx].excluded; renderMulti(); return; }
+    }
+
+    // Drawing / editing
+    if (el.eraserEnabled.checked) {
+      state.currentStroke = [];
+      if (isMulti) editAtEventMulti(evt);
+      else editAtEventSingle(evt);
+      return;
+    }
+
+    // Image drag (single mode only)
+    if (!isMulti && state.image) {
+      state.dragImage = { pointerId: evt.pointerId, startClientX: evt.clientX, startClientY: evt.clientY,
+        startX: parseFloat(el.imageX.value) || 0, startY: parseFloat(el.imageY.value) || 0 };
+    }
+  });
+
+  el.canvasWrap.addEventListener('pointermove', function(evt) {
+    if (vp.panning) {
+      vp.ox += evt.clientX - vp.lastX; vp.oy += evt.clientY - vp.lastY;
+      vp.lastX = evt.clientX; vp.lastY = evt.clientY;
+      applyVpTransform(); return;
+    }
+    var isMulti = el.multiMode.checked;
+
+    if (state.dragImage && !el.eraserEnabled.checked && !isMulti) {
+      var scaleX = vp.scale, scaleY = vp.scale;
+      el.imageX.value = Math.round(state.dragImage.startX + (evt.clientX - state.dragImage.startClientX) / scaleX);
+      el.imageY.value = Math.round(state.dragImage.startY + (evt.clientY - state.dragImage.startClientY) / scaleY);
       resetEdits(); scheduleUpdate(); return;
     }
-    var pos = pointerCell(evt);
-    if (pos) { state.pointer.visible = true; state.pointer.col = pos.col; state.pointer.row = pos.row; if (state.previewData) drawPreview(state.previewData); }
-    if (evt.buttons) editAtEvent(evt);
+
+    if (evt.buttons) {
+      if (isMulti) editAtEventMulti(evt);
+      else editAtEventSingle(evt);
+    } else {
+      // hover cursor
+      if (!isMulti && state.previewData) {
+        var pos = pointerCell(evt);
+        if (pos) { state.pointer.visible = true; state.pointer.col = pos.col; state.pointer.row = pos.row; renderSingle(state.previewData); }
+      }
+    }
   });
-  el.preview.addEventListener('pointerup', function (evt) {
-    if (state.dragImage && state.dragImage.pointerId === evt.pointerId) state.dragImage = null;
-    if (state.panDrag && state.panDrag.id===evt.pointerId) state.panDrag=null;
+
+  el.canvasWrap.addEventListener('pointerup', function(evt) {
+    if (vp.panning) { vp.panning = false; el.canvasWrap.classList.remove('panning'); return; }
+    if (state.dragImage) state.dragImage = null;
     if (el.eraserEnabled.checked && state.currentStroke && state.currentStroke.length) state.actionHistory.push(state.currentStroke);
     state.currentStroke = null;
   });
-  el.preview.addEventListener('pointerleave', function () {
+
+  el.canvasWrap.addEventListener('pointerleave', function() {
     state.pointer.visible = false;
-    if (!state.dragImage && state.previewData) drawPreview(state.previewData);
+    if (!state.dragImage && state.previewData && !el.multiMode.checked) renderSingle(state.previewData);
   });
 
-  el.undoErase.addEventListener('click', function () {
+  // Mouse wheel zoom
+  el.canvasWrap.addEventListener('wheel', function(evt) {
+    evt.preventDefault();
+    var rect = el.canvasWrap.getBoundingClientRect();
+    var mx = evt.clientX - rect.left, my = evt.clientY - rect.top;
+    var delta = evt.deltaY < 0 ? 1.1 : 0.9;
+    var newScale = clamp(vp.scale * delta, 0.1, 20);
+    // zoom toward cursor
+    vp.ox = mx - (mx - vp.ox) * (newScale / vp.scale);
+    vp.oy = my - (my - vp.oy) * (newScale / vp.scale);
+    vp.scale = newScale;
+    applyVpTransform();
+  }, { passive: false });
+
+  // Spacebar for hand tool
+  document.addEventListener('keydown', function(e) {
+    if (e.code === 'Space' && !e.repeat && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+      e.preventDefault(); vp.spaceDown = true;
+      el.canvasWrap.classList.add('pan-mode');
+    }
+  });
+  document.addEventListener('keyup', function(e) {
+    if (e.code === 'Space') {
+      vp.spaceDown = false; vp.panning = false;
+      el.canvasWrap.classList.remove('pan-mode', 'panning');
+      setTool('arrow');
+    }
+  });
+
+  // ── tool buttons ──────────────────────────────────────────────────────────
+
+  function setTool(tool) {
+    currentTool = tool;
+    el.toolArrow.classList.toggle('active', tool === 'arrow');
+    el.toolHand.classList.toggle('active', tool === 'hand');
+    el.canvasWrap.classList.toggle('pan-mode', tool === 'hand');
+  }
+
+  el.toolArrow.addEventListener('click', function() { setTool('arrow'); });
+  el.toolHand.addEventListener('click', function() { setTool('hand'); });
+
+  // ── zoom buttons ──────────────────────────────────────────────────────────
+
+  el.zoomIn.addEventListener('click', function() {
+    vp.scale = clamp(vp.scale * 1.25, 0.1, 20); applyVpTransform();
+  });
+  el.zoomOut.addEventListener('click', function() {
+    vp.scale = clamp(vp.scale / 1.25, 0.1, 20); applyVpTransform();
+  });
+  el.zoomReset.addEventListener('click', function() {
+    vp.scale = 1; centerVp();
+  });
+
+  // ── undo / clear ──────────────────────────────────────────────────────────
+
+  el.undoErase.addEventListener('click', function() {
     var changed = state.eraseHistory.pop();
-    if (changed && state.eraseMask) { changed.forEach(function (cell) { state.eraseMask[cell[0]][cell[1]] = cell[2]; }); scheduleUpdate(); }
+    if (changed && state.eraseMask) { changed.forEach(function(cell){ state.eraseMask[cell[0]][cell[1]] = cell[2]; }); scheduleUpdate(); }
   });
-
-  el.undoAction.addEventListener('click', function () {
-    var action = state.actionHistory.pop(); if (!action || !state.eraseMask) return;
+  el.undoAction.addEventListener('click', function() {
+    var action = state.actionHistory.pop();
+    if (!action || !state.eraseMask) return;
     for (var i = action.length - 1; i >= 0; i--) {
       var changed = action[i];
       for (var j = 0; j < changed.length; j++) state.eraseMask[changed[j][0]][changed[j][1]] = changed[j][2];
@@ -887,8 +1480,8 @@
     }
     scheduleUpdate();
   });
-
-  el.centerImage.addEventListener('click', function () {
+  el.clearErase.addEventListener('click', function() { resetEdits(); scheduleUpdate(); });
+  el.centerImage.addEventListener('click', function() {
     if (!state.image) return;
     var fit = Math.min(1, options().previewWidth / state.sourceCanvas.width, options().previewHeight / state.sourceCanvas.height);
     el.imageScale.value = fit; el.imageScaleNum.value = fit.toFixed(2);
@@ -896,53 +1489,58 @@
     el.imageY.value = Math.round((options().previewHeight - state.sourceCanvas.height * fit) / 2);
     resetEdits(); scheduleUpdate();
   });
-  el.clearErase.addEventListener('click', function () { resetEdits(); scheduleUpdate(); });
 
-  el.file.addEventListener('change', function () {
-    if (!(el.file.files&&el.file.files.length)) return;
-    var files=Array.from(el.file.files);
-    state.multiImages=[];
-    files.forEach(function(f,idx){ state.multiImages.push({file:f,enabled:true,index:idx+1});});
-    loadImage(files[0]);
-    el.downloadMultiAeJsx.disabled = !(el.multiFiles.checked && files.length>1);
+  // ── file input ────────────────────────────────────────────────────────────
+
+  el.file.addEventListener('change', function() {
+    if (el.file.files && el.file.files[0]) loadSingleImage(el.file.files[0]);
   });
-  el.downloadJson.addEventListener('click', function () {
-    if (state.lottieText) downloadBlob(new Blob([state.lottieText], { type: 'application/json' }), state.imageName + '_afterdither.json');
+
+  // ── export buttons ────────────────────────────────────────────────────────
+
+  el.downloadJson.addEventListener('click', function() {
+    if (state.lottieText) downloadBlob(new Blob([state.lottieText], {type:'application/json'}), state.imageName + '_afterdither.json');
   });
-  el.downloadTgs.addEventListener('click', function () {
+  el.downloadTgs.addEventListener('click', function() {
     if (state.tgsBlob) downloadBlob(state.tgsBlob, state.imageName + '_afterdither.tgs');
   });
-  el.copyAeJsx.addEventListener('click', function () {
+  el.copyAeJsx.addEventListener('click', function() {
     if (!state.aeJsxText || !navigator.clipboard) return;
-    navigator.clipboard.writeText(state.aeJsxText).then(function () {
-      el.note.textContent = 'AE JSX скопирован. В After Effects: File > Scripts > Run Script File или вставь в ExtendScript runner.';
+    navigator.clipboard.writeText(state.aeJsxText).then(function() {
+      el.note.textContent = 'AE JSX скопирован.';
+    });
+  });
+  el.downloadAeJsx.addEventListener('click', function() {
+    if (state.aeJsxText) downloadBlob(new Blob([state.aeJsxText], {type:'text/javascript'}), state.imageName + '_afterdither_ae.jsx');
+  });
+
+  // Multi-export: download all non-excluded as JSX with frame numbers
+  el.downloadMultiJsx.addEventListener('click', function() {
+    var opts = options();
+    var frameNum = 1;
+    multi.files.forEach(function(mf, i) {
+      if (mf.excluded) return;
+      if (!mf.aeJsxText) {
+        // build on demand
+        var cellOpts = Object.assign({}, opts, {
+          previewWidth: opts.previewWidth, previewHeight: opts.previewHeight,
+          imageX: Math.round((opts.previewWidth - mf.sourceCanvas.width * opts.imageScale) / 2),
+          imageY: Math.round((opts.previewHeight - mf.sourceCanvas.height * opts.imageScale) / 2)
+        });
+        var data = ditherSourceCanvas(mf.sourceCanvas, cellOpts);
+        applyEraseMask(data, mf);
+        mf.aeJsxText = buildAeJsx(data, opts, mf.name, frameNum);
+      }
+      // filename: originalname_framenum_sequentialindex.jsx
+      var fname = mf.name + '_' + frameNum + '_' + (i+1) + '.jsx';
+      downloadBlob(new Blob([mf.aeJsxText], {type:'text/javascript'}), fname);
+      frameNum++;
     });
   });
 
-  syncRange(el.viewportZoom, el.viewportZoomNum);
-  document.querySelectorAll('[data-reset]').forEach(function(btn){btn.addEventListener('click',function(){
-    var map={pixelSize:['pixelSize','pixelSizeNum',8],pixelGap:['pixelGap','pixelGapNum',0],brightness:['brightness','brightnessNum',0],contrast:['contrast','contrastNum',0],threshold:['threshold','thresholdNum',50],previewSize:['previewWidth','previewHeight',512],imagePos:['imageX','imageY',0],imageScale:['imageScale','imageScaleNum',1]};
-    var k=btn.getAttribute('data-reset'),m=map[k]; if(!m)return;
-    if(k==='previewSize'){el[m[0]].value=512;el[m[1]].value=512;} else if(k==='imagePos'){el[m[0]].value=0;el[m[1]].value=0;} else {el[m[0]].value=m[2];el[m[1]].value=m[2];}
-    resetEdits(); scheduleUpdate();
-  });});
-  el.toolArrow.addEventListener('click',function(){state.activeTool='arrow'; setToolButtons();});
-  el.toolHand.addEventListener('click',function(){state.activeTool='hand'; setToolButtons();});
-  window.addEventListener('keydown',function(e){if(e.code==='Space'){ e.preventDefault(); state.spaceHand=true; setToolButtons(); }});
-  window.addEventListener('keyup',function(e){if(e.code==='Space'){ state.spaceHand=false; setToolButtons(); }});
-  el.viewportZoom.addEventListener('input',function(){state.viewZoom=readNumber(el.viewportZoom.value,1); el.viewportZoomNum.value=state.viewZoom.toFixed(2); applyViewportTransform();});
-  el.viewportZoomNum.addEventListener('input',function(){state.viewZoom=clamp(readNumber(el.viewportZoomNum.value,1),0.25,8); el.viewportZoom.value=state.viewZoom; applyViewportTransform();});
-  el.viewportWrap.addEventListener('wheel',function(e){e.preventDefault(); var prev=state.viewZoom; var z=clamp(prev+(e.deltaY<0?0.1:-0.1),0.25,8); state.viewZoom=z; el.viewportZoom.value=z; el.viewportZoomNum.value=z.toFixed(2); applyViewportTransform();});
-  el.downloadAeJsx.addEventListener('click', function () {
-    if (state.aeJsxText) downloadBlob(new Blob([state.aeJsxText], { type: 'text/javascript' }), state.imageName + '_afterdither_ae.jsx');
-  });
-  setToolButtons();
-  applyViewportTransform();
-  el.multiFiles.addEventListener('change',function(){ el.file.multiple = !!el.multiFiles.checked; });
-  el.downloadMultiAeJsx.addEventListener('click', function(){
-    if(!el.multiFiles.checked||!state.multiImages.length||!state.aeJsxText) return;
-    state.multiImages.forEach(function(item,idx){ if(!item.enabled) return; var nm=baseName(item.file.name)+(idx+1)+'_'+(idx+1)+'.jsx'; downloadBlob(new Blob([state.aeJsxText],{type:'text/javascript'}),nm);});
-  });
+  // ── init ──────────────────────────────────────────────────────────────────
+  applyVpTransform();
+
 }());
 </script>
 </body>
