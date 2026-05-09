@@ -81,10 +81,11 @@
     input[type="range"] { width: 100%; }
     .range-line {
       display: grid;
-      grid-template-columns: 1fr 78px;
+      grid-template-columns: 1fr 78px 38px;
       gap: 10px;
       align-items: center;
     }
+    .reset-btn{padding:6px 0;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--text);cursor:pointer;}
     .check-line {
       display: flex;
       gap: 9px;
@@ -149,53 +150,61 @@
     <aside>
       <div class="row">
         <label for="file">Изображение</label>
-        <input id="file" type="file" accept="image/*" />
+        <input id="file" type="file" accept="image/*" multiple />
+        <div class="check-line" style="margin-top:8px"><input id="multiFiles" type="checkbox" /><label for="multiFiles">мульти файлы</label></div>
         <div class="hint">PNG с прозрачностью поддерживается: полностью прозрачные области не рисуются.</div>
       </div>
 
       <div class="row">
         <label>Pixel Size</label>
-        <div class="range-line"><input id="pixelSize" type="range" min="1" max="64" step="1" value="8" /><input id="pixelSizeNum" type="number" min="1" max="256" step="1" value="8" /></div>
+        <div class="range-line"><input id="pixelSize" type="range" min="1" max="64" step="1" value="8" /><input id="pixelSizeNum" type="number" min="1" max="256" step="1" value="8" /><button class="reset-btn" data-reset="pixelSize">🔄</button></div>
         <div class="hint">Размер одного dither-квадрата в пикселях выходного Lottie.</div>
       </div>
 
       <div class="row">
         <label>Pixel Gap</label>
-        <div class="range-line"><input id="pixelGap" type="range" min="0" max="32" step="1" value="0" /><input id="pixelGapNum" type="number" min="0" max="64" step="1" value="0" /></div>
+        <div class="range-line"><input id="pixelGap" type="range" min="0" max="32" step="1" value="0" /><input id="pixelGapNum" type="number" min="0" max="64" step="1" value="0" /><button class="reset-btn" data-reset="pixelGap">🔄</button></div>
         <div class="hint">Отступ между dither-клетками в пикселях предпросмотра и экспорта.</div>
       </div>
 
       <div class="row">
         <label>Brightness</label>
-        <div class="range-line"><input id="brightness" type="range" min="-100" max="100" step="1" value="0" /><input id="brightnessNum" type="number" min="-100" max="100" step="1" value="0" /></div>
+        <div class="range-line"><input id="brightness" type="range" min="-100" max="100" step="1" value="0" /><input id="brightnessNum" type="number" min="-100" max="100" step="1" value="0" /><button class="reset-btn" data-reset="brightness">🔄</button></div>
       </div>
 
       <div class="row">
         <label>Contrast</label>
-        <div class="range-line"><input id="contrast" type="range" min="-254" max="254" step="1" value="0" /><input id="contrastNum" type="number" min="-254" max="254" step="1" value="0" /></div>
+        <div class="range-line"><input id="contrast" type="range" min="-254" max="254" step="1" value="0" /><input id="contrastNum" type="number" min="-254" max="254" step="1" value="0" /><button class="reset-btn" data-reset="contrast">🔄</button></div>
       </div>
 
       <div class="row">
         <label>Threshold</label>
-        <div class="range-line"><input id="threshold" type="range" min="0" max="100" step="1" value="50" /><input id="thresholdNum" type="number" min="0" max="100" step="1" value="50" /></div>
+        <div class="range-line"><input id="threshold" type="range" min="0" max="100" step="1" value="50" /><input id="thresholdNum" type="number" min="0" max="100" step="1" value="50" /><button class="reset-btn" data-reset="threshold">🔄</button></div>
       </div>
 
       <div class="row">
         <label>Preview / export size</label>
-        <div class="range-line"><input id="previewWidth" type="number" min="16" max="4096" step="1" value="512" /><input id="previewHeight" type="number" min="16" max="4096" step="1" value="512" /></div>
+        <div class="range-line"><input id="previewWidth" type="number" min="16" max="4096" step="1" value="512" /><input id="previewHeight" type="number" min="16" max="4096" step="1" value="512" /><button class="reset-btn" data-reset="previewSize">🔄</button></div>
         <div class="hint">Размер окна превью и Lottie/TGS композиции. По умолчанию 512×512.</div>
       </div>
 
       <div class="row">
         <label>Image position X / Y</label>
-        <div class="range-line"><input id="imageX" type="number" min="-4096" max="4096" step="1" value="0" /><input id="imageY" type="number" min="-4096" max="4096" step="1" value="0" /></div>
+        <div class="range-line"><input id="imageX" type="number" min="-4096" max="4096" step="1" value="0" /><input id="imageY" type="number" min="-4096" max="4096" step="1" value="0" /><button class="reset-btn" data-reset="imagePos">🔄</button></div>
         <div class="hint">Положение исходной картинки внутри превью перед дизерингом. Можно также перетаскивать картинку мышью, когда ручное редактирование выключено.</div>
       </div>
 
       <div class="row">
         <label>Image scale</label>
-        <div class="range-line"><input id="imageScale" type="range" min="0.05" max="16" step="0.05" value="1" /><input id="imageScaleNum" type="number" min="0.01" max="64" step="0.05" value="1" /></div>
+        <div class="range-line"><input id="imageScale" type="range" min="0.05" max="16" step="0.05" value="1" /><input id="imageScaleNum" type="number" min="0.01" max="64" step="0.05" value="1" /><button class="reset-btn" data-reset="imageScale">🔄</button></div>
         <div class="hint">Масштаб исходной картинки внутри превью.</div>
+      </div>
+
+      
+      <div class="row">
+        <label>Viewport zoom / tool</label>
+        <div class="range-line"><input id="viewportZoom" type="range" min="0.25" max="4" step="0.05" value="1" /><input id="viewportZoomNum" type="number" min="0.25" max="8" step="0.05" value="1" /></div>
+        <div class="button-grid" style="margin-top:6px"><button id="toolArrow" class="secondary small">↖ Стрелка</button><button id="toolHand" class="secondary small">✋ Рука</button></div>
       </div>
 
       <div class="row check-line">
@@ -266,11 +275,12 @@
       <button id="downloadTgs" class="secondary" disabled>Скачать .tgs gzip</button>
       <button id="copyAeJsx" class="secondary" disabled>Copy AE JSX для импорта</button>
       <button id="downloadAeJsx" class="secondary" disabled>Скачать AE JSX</button>
+      <button id="downloadMultiAeJsx" class="secondary" disabled>Скачать multi AE JSX</button>
       <div class="note row" id="note">Загрузи изображение, затем крути настройки — превью и расчёт веса обновляются автоматически.</div>
     </aside>
 
     <section class="stage">
-      <div class="canvas-wrap"><canvas id="preview" width="512" height="512"></canvas></div>
+      <div class="canvas-wrap" id="viewportWrap"><canvas id="preview" width="512" height="512"></canvas></div>
       <div class="stats">
         <div class="stat"><b>Сетка</b><span id="gridStat">—</span></div>
         <div class="stat"><b>Чёрных клеток</b><span id="blackStat">—</span></div>
@@ -303,12 +313,19 @@
     actionHistory: [],
     currentStroke: null,
     pointer: { visible: false, col: 0, row: 0 },
-    dragImage: null
+    dragImage: null,
+    multiImages: [],
+    activeTool: 'arrow',
+    viewPan: {x:0,y:0},
+    viewZoom:1,
+    panDrag:null,
+    spaceHand:false
   };
 
   var el = {
     file: document.getElementById('file'),
     preview: document.getElementById('preview'),
+    viewportWrap: document.getElementById('viewportWrap'),
     pixelSize: document.getElementById('pixelSize'),
     pixelSizeNum: document.getElementById('pixelSizeNum'),
     pixelGap: document.getElementById('pixelGap'),
@@ -344,6 +361,12 @@
     downloadTgs: document.getElementById('downloadTgs'),
     copyAeJsx: document.getElementById('copyAeJsx'),
     downloadAeJsx: document.getElementById('downloadAeJsx'),
+    downloadMultiAeJsx: document.getElementById('downloadMultiAeJsx'),
+    multiFiles: document.getElementById('multiFiles'),
+    viewportZoom: document.getElementById('viewportZoom'),
+    viewportZoomNum: document.getElementById('viewportZoomNum'),
+    toolArrow: document.getElementById('toolArrow'),
+    toolHand: document.getElementById('toolHand'),
     note: document.getElementById('note'),
     gridStat: document.getElementById('gridStat'),
     blackStat: document.getElementById('blackStat'),
@@ -353,25 +376,16 @@
     limitStat: document.getElementById('limitStat')
   };
 
-  function clamp(v, lo, hi) {
-    return Math.max(lo, Math.min(hi, v));
-  }
-
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
   function formatBytes(bytes) {
     if (!bytes && bytes !== 0) return '—';
     if (bytes < 1024) return bytes + ' B';
     return (bytes / 1024).toFixed(bytes < 1024 * 1024 ? 1 : 2) + (bytes < 1024 * 1024 ? ' KB' : ' MB');
   }
-
-  function baseName(name) {
-    return String(name || 'afterdither').replace(/\.[^.]+$/, '').replace(/[^a-z0-9_-]+/gi, '_') || 'afterdither';
-  }
+  function baseName(name) { return String(name || 'afterdither').replace(/\.[^.]+$/, '').replace(/[^a-z0-9_-]+/gi, '_') || 'afterdither'; }
 
   function syncRange(range, number) {
-    function fromRange() {
-      number.value = range.value;
-      scheduleUpdate();
-    }
+    function fromRange() { number.value = range.value; scheduleUpdate(); }
     function fromNumber() {
       var value = clamp(parseFloat(number.value) || parseFloat(range.value), parseFloat(number.min), parseFloat(number.max));
       number.value = value;
@@ -380,6 +394,7 @@
     }
     range.addEventListener('input', fromRange);
     number.addEventListener('change', fromNumber);
+    number.addEventListener('input', fromNumber);
   }
 
   function readNumber(value, fallback) {
@@ -477,117 +492,65 @@
     }
 
     return {
-      black: black,
-      cols: cols,
-      rows: rows,
-      width: outputWidth,
-      height: outputHeight,
-      cell: visualCell,
-      gap: opts.pixelGap,
-      blackCount: blackCount,
-      imageX: opts.imageX,
-      imageY: opts.imageY,
-      imageScale: opts.imageScale
+      black: black, cols: cols, rows: rows, width: outputWidth, height: outputHeight,
+      cell: visualCell, gap: opts.pixelGap, blackCount: blackCount,
+      imageX: opts.imageX, imageY: opts.imageY, imageScale: opts.imageScale
     };
   }
 
   function makeEmptyEraseMask(rows, cols) {
     var mask = [];
-    for (var r = 0; r < rows; r++) {
-      mask[r] = [];
-      for (var c = 0; c < cols; c++) mask[r][c] = null;
-    }
+    for (var r = 0; r < rows; r++) { mask[r] = []; for (var c = 0; c < cols; c++) mask[r][c] = null; }
     return mask;
   }
-
   function ensureEraseMask(data) {
     if (!state.eraseMask || state.eraseMask.length !== data.rows || !state.eraseMask[0] || state.eraseMask[0].length !== data.cols) {
-      state.eraseMask = makeEmptyEraseMask(data.rows, data.cols);
-      state.eraseHistory = [];
+      state.eraseMask = makeEmptyEraseMask(data.rows, data.cols); state.eraseHistory = [];
     }
   }
-
   function applyEraseMask(data) {
     ensureEraseMask(data);
     var blackCount = 0;
-    for (var r = 0; r < data.rows; r++) {
-      for (var c = 0; c < data.cols; c++) {
-        if (state.eraseMask[r][c] !== null) data.black[r][c] = state.eraseMask[r][c] === 1;
-        if (data.black[r][c]) blackCount++;
-      }
+    for (var r = 0; r < data.rows; r++) for (var c = 0; c < data.cols; c++) {
+      if (state.eraseMask[r][c] !== null) data.black[r][c] = state.eraseMask[r][c] === 1;
+      if (data.black[r][c]) blackCount++;
     }
     data.blackCount = blackCount;
   }
-
   function resetEdits() {
-    state.eraseMask = null;
-    state.eraseHistory = [];
-    state.actionHistory = [];
-    state.currentStroke = null;
-    el.undoErase.disabled = true;
-    el.undoAction.disabled = true;
-    el.clearErase.disabled = true;
+    state.eraseMask = null; state.eraseHistory = []; state.actionHistory = []; state.currentStroke = null;
+    el.undoErase.disabled = true; el.undoAction.disabled = true; el.clearErase.disabled = true;
   }
 
-  function keyFor(c, r) {
-    return c + ',' + r;
-  }
-
+  function keyFor(c, r) { return c + ',' + r; }
   function collectComponents(black, includeDiagonal) {
-    var rows = black.length;
-    var cols = rows ? black[0].length : 0;
-    var seen = Object.create(null);
-    var comps = [];
+    var rows = black.length, cols = rows ? black[0].length : 0, seen = Object.create(null), comps = [];
     var dirs = includeDiagonal ? [[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]] : [[0,-1],[-1,0],[1,0],[0,1]];
-    for (var r = 0; r < rows; r++) {
-      for (var c = 0; c < cols; c++) {
-        var k = keyFor(c, r);
-        if (!black[r][c] || seen[k]) continue;
-        var stack = [{ c: c, r: r }];
-        var cells = [];
-        seen[k] = true;
-        while (stack.length) {
-          var cur = stack.pop();
-          cells.push(cur);
-          for (var d = 0; d < dirs.length; d++) {
-            var nc = cur.c + dirs[d][0];
-            var nr = cur.r + dirs[d][1];
-            var nk = keyFor(nc, nr);
-            if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && black[nr][nc] && !seen[nk]) {
-              seen[nk] = true;
-              stack.push({ c: nc, r: nr });
-            }
-          }
+    for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+      var k = keyFor(c, r); if (!black[r][c] || seen[k]) continue;
+      var stack = [{ c: c, r: r }], cells = []; seen[k] = true;
+      while (stack.length) {
+        var cur = stack.pop(); cells.push(cur);
+        for (var d = 0; d < dirs.length; d++) {
+          var nc = cur.c + dirs[d][0], nr = cur.r + dirs[d][1], nk = keyFor(nc, nr);
+          if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && black[nr][nc] && !seen[nk]) { seen[nk] = true; stack.push({ c: nc, r: nr }); }
         }
-        comps.push(cells);
       }
+      comps.push(cells);
     }
     return comps;
   }
-
   function splitFourConnected(cells) {
-    var cellSet = Object.create(null);
-    cells.forEach(function (cell) { cellSet[keyFor(cell.c, cell.r)] = true; });
-    var seen = Object.create(null);
-    var islands = [];
-    var dirs = [[0,-1],[-1,0],[1,0],[0,1]];
+    var cellSet = Object.create(null); cells.forEach(function (cell) { cellSet[keyFor(cell.c, cell.r)] = true; });
+    var seen = Object.create(null), islands = [], dirs = [[0,-1],[-1,0],[1,0],[0,1]];
     for (var i = 0; i < cells.length; i++) {
-      var k = keyFor(cells[i].c, cells[i].r);
-      if (seen[k]) continue;
-      var stack = [cells[i]];
-      var island = [];
-      seen[k] = true;
+      var k = keyFor(cells[i].c, cells[i].r); if (seen[k]) continue;
+      var stack = [cells[i]], island = []; seen[k] = true;
       while (stack.length) {
-        var cur = stack.pop();
-        island.push(cur);
+        var cur = stack.pop(); island.push(cur);
         for (var d = 0; d < dirs.length; d++) {
-          var nc = cur.c + dirs[d][0];
-          var nr = cur.r + dirs[d][1];
-          var nk = keyFor(nc, nr);
-          if (cellSet[nk] && !seen[nk]) {
-            seen[nk] = true;
-            stack.push({ c: nc, r: nr });
-          }
+          var nc = cur.c + dirs[d][0], nr = cur.r + dirs[d][1], nk = keyFor(nc, nr);
+          if (cellSet[nk] && !seen[nk]) { seen[nk] = true; stack.push({ c: nc, r: nr }); }
         }
       }
       islands.push(island);
@@ -595,142 +558,75 @@
     return islands;
   }
 
-  function edgeKey(a, b) {
-    return a.x + ',' + a.y + '>' + b.x + ',' + b.y;
-  }
-
-  function reverseEdgeKey(a, b) {
-    return b.x + ',' + b.y + '>' + a.x + ',' + a.y;
-  }
-
+  function edgeKey(a, b) { return a.x + ',' + a.y + '>' + b.x + ',' + b.y; }
+  function reverseEdgeKey(a, b) { return b.x + ',' + b.y + '>' + a.x + ',' + a.y; }
   function addEdge(edges, a, b) {
     var rev = reverseEdgeKey(a, b);
-    if (edges[rev]) delete edges[rev];
-    else edges[edgeKey(a, b)] = { a: a, b: b };
+    if (edges[rev]) delete edges[rev]; else edges[edgeKey(a, b)] = { a: a, b: b };
   }
 
   function islandToPaths(island, cellSize) {
     var edges = Object.create(null);
     island.forEach(function (cell) {
-      var c = cell.c;
-      var r = cell.r;
+      var c = cell.c, r = cell.r;
       addEdge(edges, { x: c, y: r }, { x: c + 1, y: r });
       addEdge(edges, { x: c + 1, y: r }, { x: c + 1, y: r + 1 });
       addEdge(edges, { x: c + 1, y: r + 1 }, { x: c, y: r + 1 });
       addEdge(edges, { x: c, y: r + 1 }, { x: c, y: r });
     });
 
-    var outgoing = Object.create(null);
-    var keys = Object.keys(edges);
-    keys.forEach(function (ek) {
-      var start = edges[ek].a.x + ',' + edges[ek].a.y;
-      if (!outgoing[start]) outgoing[start] = [];
-      outgoing[start].push(ek);
+    var vertexEdges = Object.create(null);
+    Object.keys(edges).forEach(function (key) {
+      var e = edges[key], startKey = e.a.x + ',' + e.a.y;
+      if (!vertexEdges[startKey]) vertexEdges[startKey] = [];
+      vertexEdges[startKey].push(e);
     });
 
-    function pickNextEdge(candidates) {
-      for (var j = candidates.length - 1; j >= 0; j--) {
-        if (!used[candidates[j]]) return edges[candidates[j]];
-      }
-      return null;
-    }
-
-    var used = Object.create(null);
-    var paths = [];
-    keys.forEach(function (startKey) {
-      if (used[startKey]) return;
-      var e = edges[startKey];
-      var start = e.a.x + ',' + e.a.y;
-      var current = e;
-      var verts = [];
-      while (current && !used[edgeKey(current.a, current.b)]) {
+    var visited = Object.create(null), paths = [];
+    Object.keys(edges).forEach(function (key) {
+      if (visited[key]) return;
+      var path = [], current = edges[key];
+      while (current) {
         var ck = edgeKey(current.a, current.b);
-        used[ck] = true;
-        verts.push([current.a.x * cellSize, current.a.y * cellSize]);
-        var nextStart = current.b.x + ',' + current.b.y;
-        var candidates = outgoing[nextStart] || [];
-        current = pickNextEdge(candidates);
-        if (nextStart === start && !current) break;
+        if (visited[ck]) break;
+        visited[ck] = true;
+        path.push({ x: current.a.x * cellSize, y: current.a.y * cellSize });
+        var nextList = vertexEdges[current.b.x + ',' + current.b.y] || [], next = null;
+        for (var i = 0; i < nextList.length; i++) {
+          var nk = edgeKey(nextList[i].a, nextList[i].b);
+          if (!visited[nk]) { next = nextList[i]; break; }
+        }
+        current = next;
       }
-      if (verts.length >= 3) paths.push(verts);
+      if (path.length) paths.push(path);
     });
     return paths;
   }
 
-  function shapePath(vertices) {
-    var zeroTangents = vertices.map(function () { return [0, 0]; });
-    return {
-      ty: 'sh',
-      ks: {
-        a: 0,
-        k: {
-          i: zeroTangents,
-          o: zeroTangents,
-          v: vertices,
-          c: true
-        }
-      }
-    };
+  function pathsToLottieShapes(paths) {
+    return paths.map(function (path, idx) {
+      var vertices = path.map(function (p) { return [p.x, p.y]; });
+      return { ty: 'sh', ix: idx + 1, ks: { a: 0, k: { i: vertices.map(function () { return [0, 0]; }), o: vertices.map(function () { return [0, 0]; }), v: vertices, c: true } }, nm: 'Path ' + (idx + 1) };
+    });
   }
 
   function buildLottie(data, opts) {
-    var components = collectComponents(data.black, opts.mergeDiagonal);
-    var groups = [];
-    for (var i = 0; i < components.length; i++) {
-      var groupItems = [];
-      var islands = opts.mergeDiagonal ? [components[i]] : splitFourConnected(components[i]);
-      for (var j = 0; j < islands.length; j++) {
-        var paths = islandToPaths(islands[j], data.cell);
-        for (var p = 0; p < paths.length; p++) {
-          groupItems.push(shapePath(paths[p]));
-        }
-      }
+    var comps = collectComponents(data.black, opts.mergeDiagonal), groups = [];
+    comps.forEach(function (component, i) {
+      var islands = opts.mergeDiagonal ? splitFourConnected(component) : [component], groupItems = [];
+      islands.forEach(function (island) {
+        var paths = islandToPaths(island, data.cell);
+        pathsToLottieShapes(paths).forEach(function (shape) { groupItems.push(shape); });
+      });
       if (groupItems.length) {
-        groupItems.push({ ty: 'fl', c: { a: 0, k: [0, 0, 0, 1] }, o: { a: 0, k: 100 }, r: 1 });
-        groupItems.push({
-          ty: 'tr',
-          p: { a: 0, k: [0, 0] },
-          a: { a: 0, k: [0, 0] },
-          s: { a: 0, k: [100, 100] },
-          r: { a: 0, k: 0 },
-          o: { a: 0, k: 100 },
-          sk: { a: 0, k: 0 },
-          sa: { a: 0, k: 0 }
-        });
+        groupItems.push({ ty: 'fl', c: { a: 0, k: [0, 0, 0, 1] }, o: { a: 0, k: 100 }, r: 1, bm: 0, nm: 'Fill 1' });
         groups.push({ ty: 'gr', nm: 'Cluster ' + (i + 1), it: groupItems });
       }
-    }
+    });
 
     return {
-      v: '5.7.4',
-      fr: opts.fps,
-      ip: 0,
-      op: opts.duration,
-      w: data.width,
-      h: data.height,
-      nm: 'AfterDither_' + state.imageName,
-      ddd: 0,
-      assets: [],
-      layers: [{
-        ddd: 0,
-        ind: 1,
-        ty: 4,
-        nm: 'Black Dither',
-        sr: 1,
-        ks: {
-          o: { a: 0, k: 100 },
-          r: { a: 0, k: 0 },
-          p: { a: 0, k: [0, 0, 0] },
-          a: { a: 0, k: [0, 0, 0] },
-          s: { a: 0, k: [100, 100, 100] }
-        },
-        ao: 0,
-        shapes: groups,
-        ip: 0,
-        op: opts.duration,
-        st: 0,
-        bm: 0
-      }]
+      v: '5.7.4', fr: opts.fps, ip: 0, op: opts.duration, w: data.width, h: data.height, nm: 'AfterDither_' + state.imageName, ddd: 0, assets: [],
+      layers: [{ ddd: 0, ind: 1, ty: 4, nm: 'Black Dither', sr: 1, ks: { o: { a: 0, k: 100 }, r: { a: 0, k: 0 }, p: { a: 0, k: [0, 0, 0] }, a: { a: 0, k: [0, 0, 0] }, s: { a: 0, k: [100, 100, 100] } }, ao: 0, shapes: groups, ip: 0, op: opts.duration, st: 0, bm: 0 }]
     };
   }
 
@@ -740,11 +636,9 @@
     if (bg === 'transparent') return;
     if (bg === 'checker') {
       var tile = Math.max(8, Math.round(Math.min(width, height) / 32));
-      for (var y = 0; y < height; y += tile) {
-        for (var x = 0; x < width; x += tile) {
-          ctx.fillStyle = ((x / tile + y / tile) % 2 === 0) ? '#f3f3f3' : '#bfc6d1';
-          ctx.fillRect(x, y, tile, tile);
-        }
+      for (var y = 0; y < height; y += tile) for (var x = 0; x < width; x += tile) {
+        ctx.fillStyle = ((x / tile + y / tile) % 2 === 0) ? '#f3f3f3' : '#bfc6d1';
+        ctx.fillRect(x, y, tile, tile);
       }
       return;
     }
@@ -754,12 +648,9 @@
 
   function drawEditCursor(ctx, data) {
     if (!el.eraserEnabled.checked || !state.pointer.visible || !data) return;
-    var size = options().eraserSize;
-    var half = Math.floor(size / 2);
-    var x = (state.pointer.col - half) * data.cell;
-    var y = (state.pointer.row - half) * data.cell;
-    var w = size * data.cell;
-    var h = size * data.cell;
+    var size = options().eraserSize, half = Math.floor(size / 2);
+    var x = (state.pointer.col - half) * data.cell, y = (state.pointer.row - half) * data.cell;
+    var w = size * data.cell, h = size * data.cell;
     ctx.save();
     ctx.lineWidth = Math.max(1, Math.min(4, data.cell / 5));
     ctx.setLineDash([Math.max(3, data.cell / 2), Math.max(3, data.cell / 3)]);
@@ -774,35 +665,26 @@
 
   function drawPreview(data) {
     var canvas = el.preview;
-    canvas.width = data.width;
-    canvas.height = data.height;
+    canvas.width = data.width; canvas.height = data.height;
     var ctx = canvas.getContext('2d');
     drawPreviewBackground(ctx, canvas.width, canvas.height);
     if (state.image && options().showSource) {
-      ctx.save();
-      ctx.globalAlpha = 0.45;
-      ctx.imageSmoothingEnabled = false;
+      ctx.save(); ctx.globalAlpha = 0.45; ctx.imageSmoothingEnabled = false;
       ctx.drawImage(state.image, data.imageX, data.imageY, state.sourceCanvas.width * data.imageScale, state.sourceCanvas.height * data.imageScale);
       ctx.restore();
     }
-    ctx.fillStyle = '#000';
-    if (el.previewBg.value === 'black') ctx.fillStyle = '#fff';
-    for (var r = 0; r < data.rows; r++) {
-      for (var c = 0; c < data.cols; c++) {
-        if (data.black[r][c]) {
-          var gap = Math.min(data.gap, Math.max(0, data.cell - 1));
-          var size = Math.max(1, data.cell - gap);
-          var offset = gap / 2;
-          ctx.fillRect(c * data.cell + offset, r * data.cell + offset, size, size);
-        }
+    ctx.fillStyle = (el.previewBg.value === 'black') ? '#fff' : '#000';
+    for (var r = 0; r < data.rows; r++) for (var c = 0; c < data.cols; c++) {
+      if (data.black[r][c]) {
+        var gap = Math.min(data.gap, Math.max(0, data.cell - 1));
+        var size = Math.max(1, data.cell - gap), offset = gap / 2;
+        ctx.fillRect(c * data.cell + offset, r * data.cell + offset, size, size);
       }
     }
     drawEditCursor(ctx, data);
   }
 
-  function jsString(value) {
-    return JSON.stringify(String(value));
-  }
+  function jsString(value) { return JSON.stringify(String(value)); }
 
   function buildAeJsx(data, opts) {
     var lottie = JSON.parse(state.lottieText || JSON.stringify(buildLottie(data, opts)));
@@ -838,9 +720,7 @@
     el.blackStat.textContent = String(data.blackCount);
     var shapeGroups = JSON.parse(lottieText).layers[0].shapes || [];
     var pathCount = 0;
-    shapeGroups.forEach(function (group) {
-      (group.it || []).forEach(function (item) { if (item.ty === 'sh') pathCount++; });
-    });
+    shapeGroups.forEach(function (group) { (group.it || []).forEach(function (item) { if (item.ty === 'sh') pathCount++; }); });
     el.groupStat.textContent = shapeGroups.length + ' / ' + pathCount;
     el.jsonStat.textContent = formatBytes(new Blob([lottieText]).size);
     if (gzipBlob) {
@@ -854,10 +734,7 @@
     }
   }
 
-  function scheduleUpdate() {
-    window.clearTimeout(state.timer);
-    state.timer = window.setTimeout(update, 80);
-  }
+  function scheduleUpdate() { window.clearTimeout(state.timer); state.timer = window.setTimeout(update, 80); }
 
   function update() {
     var token = ++state.updateToken;
@@ -866,73 +743,46 @@
     window.setTimeout(function () {
       if (token !== state.updateToken) return;
       try {
-        var opts = options();
-        var data = ditherImage(opts);
+        var opts = options(), data = ditherImage(opts);
         applyEraseMask(data);
-        var lottie = buildLottie(data, opts);
-        var text = JSON.stringify(lottie);
-        state.lottieText = text;
-        state.aeJsxText = buildAeJsx(data, opts);
-        drawPreview(data);
+        var lottie = buildLottie(data, opts), text = JSON.stringify(lottie);
+        state.lottieText = text; state.aeJsxText = buildAeJsx(data, opts); drawPreview(data);
         gzipString(text).then(function (blob) {
           if (token !== state.updateToken) return;
-          state.previewData = data;
-          state.lottieText = text;
-          state.aeJsxText = buildAeJsx(data, opts);
-          state.tgsBlob = blob;
-          state.tgsBytes = blob ? blob.size : 0;
+          state.previewData = data; state.lottieText = text; state.aeJsxText = buildAeJsx(data, opts);
+          state.tgsBlob = blob; state.tgsBytes = blob ? blob.size : 0;
           updateStats(data, text, blob);
-          el.downloadJson.disabled = false;
-          el.downloadTgs.disabled = !blob;
-          el.copyAeJsx.disabled = false;
-          el.downloadAeJsx.disabled = false;
-          el.undoErase.disabled = state.eraseHistory.length === 0;
-          el.undoAction.disabled = state.actionHistory.length === 0;
-          el.clearErase.disabled = state.eraseHistory.length === 0;
+          el.downloadJson.disabled = false; el.downloadTgs.disabled = !blob; el.copyAeJsx.disabled = false; el.downloadAeJsx.disabled = false;
+          el.undoErase.disabled = state.eraseHistory.length === 0; el.undoAction.disabled = state.actionHistory.length === 0; el.clearErase.disabled = state.eraseHistory.length === 0;
           el.centerImage.disabled = !state.image;
           el.note.textContent = blob ? 'Готово. TGS вес пересчитан по gzip.' : 'Готово. Для .tgs нужен браузер с CompressionStream (Chrome/Edge/Safari новые версии).';
         });
-      } catch (err) {
-        el.note.textContent = 'Ошибка: ' + err.message;
-        console.error(err);
-      }
+      } catch (err) { el.note.textContent = 'Ошибка: ' + err.message; console.error(err); }
     }, 0);
   }
 
   function loadImage(file) {
-    var url = URL.createObjectURL(file);
-    var img = new Image();
+    var url = URL.createObjectURL(file), img = new Image();
     img.onload = function () {
       URL.revokeObjectURL(url);
-      state.image = img;
-      state.imageName = baseName(file.name);
-      state.sourceCanvas.width = img.naturalWidth || img.width;
-      state.sourceCanvas.height = img.naturalHeight || img.height;
+      state.image = img; state.imageName = baseName(file.name);
+      state.sourceCanvas.width = img.naturalWidth || img.width; state.sourceCanvas.height = img.naturalHeight || img.height;
       state.sourceCanvas.getContext('2d').clearRect(0, 0, state.sourceCanvas.width, state.sourceCanvas.height);
       state.sourceCanvas.getContext('2d').drawImage(img, 0, 0);
       var fit = Math.min(1, options().previewWidth / state.sourceCanvas.width, options().previewHeight / state.sourceCanvas.height);
-      el.imageScale.value = fit;
-      el.imageScaleNum.value = fit.toFixed(2);
+      el.imageScale.value = fit; el.imageScaleNum.value = fit.toFixed(2);
       el.imageX.value = Math.round((options().previewWidth - state.sourceCanvas.width * fit) / 2);
       el.imageY.value = Math.round((options().previewHeight - state.sourceCanvas.height * fit) / 2);
-      resetEdits();
-      scheduleUpdate();
+      resetEdits(); scheduleUpdate();
     };
-    img.onerror = function () {
-      URL.revokeObjectURL(url);
-      el.note.textContent = 'Не удалось загрузить изображение.';
-    };
+    img.onerror = function () { URL.revokeObjectURL(url); el.note.textContent = 'Не удалось загрузить изображение.'; };
     img.src = url;
   }
 
   function downloadBlob(blob, filename) {
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+    var url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
   }
 
@@ -945,15 +795,23 @@
   syncRange(el.eraserSize, el.eraserSizeNum);
 
   [el.pixelSize, el.pixelSizeNum, el.pixelGap, el.pixelGapNum, el.brightness, el.brightnessNum, el.contrast, el.contrastNum, el.threshold, el.thresholdNum, el.previewWidth, el.previewHeight, el.imageX, el.imageY, el.imageScale, el.imageScaleNum, el.transparentOnly, el.useTransformScale].forEach(function (control) {
-    control.addEventListener('input', resetEdits);
-    control.addEventListener('change', resetEdits);
+    control.addEventListener('input', resetEdits); control.addEventListener('change', resetEdits);
   });
   [el.transparentOnly, el.mergeDiagonal, el.previewBg, el.showSource, el.useTransformScale, el.previewWidth, el.previewHeight, el.imageX, el.imageY, el.imageScale, el.imageScaleNum, el.eraserSize, el.eraserSizeNum, el.fps, el.duration, el.pixelGap, el.pixelGapNum].forEach(function (control) {
-    control.addEventListener('input', scheduleUpdate);
-    control.addEventListener('change', scheduleUpdate);
+    control.addEventListener('input', scheduleUpdate); control.addEventListener('change', scheduleUpdate);
   });
   el.editTool.addEventListener('change', function () { if (state.previewData) drawPreview(state.previewData); });
   el.eraserEnabled.addEventListener('change', function () { if (state.previewData) drawPreview(state.previewData); });
+
+  function applyViewportTransform(){
+    el.preview.style.transformOrigin = '0 0';
+    el.preview.style.transform = 'translate(' + state.viewPan.x + 'px,' + state.viewPan.y + 'px) scale(' + state.viewZoom + ')';
+  }
+  function currentTool(){ return state.spaceHand ? 'hand' : state.activeTool; }
+  function setToolButtons(){
+    el.toolArrow.style.outline = currentTool()==='arrow' ? '2px solid #72d6ff' : '';
+    el.toolHand.style.outline = currentTool()==='hand' ? '2px solid #72d6ff' : '';
+  }
 
   function pointerCell(evt) {
     if (!state.previewData) return null;
@@ -965,72 +823,48 @@
 
   function editAtEvent(evt) {
     if (!el.eraserEnabled.checked || !state.previewData) return;
-    var pos = pointerCell(evt);
-    if (!pos) return;
-    state.pointer.visible = true;
-    state.pointer.col = pos.col;
-    state.pointer.row = pos.row;
-    var size = options().eraserSize;
-    var half = Math.floor(size / 2);
-    var value = el.editTool.value === 'draw' ? 1 : 0;
+    var pos = pointerCell(evt); if (!pos) return;
+    state.pointer.visible = true; state.pointer.col = pos.col; state.pointer.row = pos.row;
+    var size = options().eraserSize, half = Math.floor(size / 2), value = el.editTool.value === 'draw' ? 1 : 0;
     ensureEraseMask(state.previewData);
     var changed = [];
-    for (var r = pos.row - half; r < pos.row - half + size; r++) {
-      for (var c = pos.col - half; c < pos.col - half + size; c++) {
-        if (r >= 0 && r < state.previewData.rows && c >= 0 && c < state.previewData.cols && state.eraseMask[r][c] !== value) {
-          changed.push([r, c, state.eraseMask[r][c]]);
-          state.eraseMask[r][c] = value;
-        }
+    for (var r = pos.row - half; r < pos.row - half + size; r++) for (var c = pos.col - half; c < pos.col - half + size; c++) {
+      if (r >= 0 && r < state.previewData.rows && c >= 0 && c < state.previewData.cols && state.eraseMask[r][c] !== value) {
+        changed.push([r, c, state.eraseMask[r][c]]); state.eraseMask[r][c] = value;
       }
     }
-    if (changed.length) {
-      state.eraseHistory.push(changed);
-      if (state.currentStroke) state.currentStroke.push(changed);
-      scheduleUpdate();
-    } else {
-      drawPreview(state.previewData);
-    }
+    if (changed.length) { state.eraseHistory.push(changed); if (state.currentStroke) state.currentStroke.push(changed); scheduleUpdate(); }
+    else drawPreview(state.previewData);
   }
 
   el.preview.addEventListener('pointerdown', function (evt) {
     el.preview.setPointerCapture(evt.pointerId);
-    if (el.eraserEnabled.checked) {
-      state.currentStroke = [];
-      editAtEvent(evt);
-      return;
-    }
+    if (currentTool()==='hand') { state.panDrag={id:evt.pointerId,x:evt.clientX,y:evt.clientY,startX:state.viewPan.x,startY:state.viewPan.y}; return; }
+    if (el.eraserEnabled.checked) { state.currentStroke = []; editAtEvent(evt); return; }
     if (state.image) {
-      state.dragImage = {
-        pointerId: evt.pointerId,
-        startClientX: evt.clientX,
-        startClientY: evt.clientY,
-        startX: parseFloat(el.imageX.value) || 0,
-        startY: parseFloat(el.imageY.value) || 0
-      };
+      state.dragImage = { pointerId: evt.pointerId, startClientX: evt.clientX, startClientY: evt.clientY, startX: parseFloat(el.imageX.value) || 0, startY: parseFloat(el.imageY.value) || 0 };
     }
   });
   el.preview.addEventListener('pointermove', function (evt) {
-    if (state.dragImage && state.dragImage.pointerId === evt.pointerId && !el.eraserEnabled.checked) {
-      var rect = el.preview.getBoundingClientRect();
-      var scaleX = el.preview.width / rect.width;
-      var scaleY = el.preview.height / rect.height;
-      el.imageX.value = Math.round(state.dragImage.startX + (evt.clientX - state.dragImage.startClientX) * scaleX);
-      el.imageY.value = Math.round(state.dragImage.startY + (evt.clientY - state.dragImage.startClientY) * scaleY);
-      resetEdits();
-      scheduleUpdate();
+    if (state.panDrag && state.panDrag.id===evt.pointerId){
+      state.viewPan.x = state.panDrag.startX + (evt.clientX-state.panDrag.x);
+      state.viewPan.y = state.panDrag.startY + (evt.clientY-state.panDrag.y);
+      applyViewportTransform();
       return;
     }
-    var pos = pointerCell(evt);
-    if (pos) {
-      state.pointer.visible = true;
-      state.pointer.col = pos.col;
-      state.pointer.row = pos.row;
-      if (state.previewData) drawPreview(state.previewData);
+    if (state.dragImage && state.dragImage.pointerId === evt.pointerId && !el.eraserEnabled.checked && currentTool()==='arrow') {
+      var rect = el.preview.getBoundingClientRect(), scaleX = el.preview.width / rect.width, scaleY = el.preview.height / rect.height;
+      el.imageX.value = Math.round(state.dragImage.startX + (evt.clientX - state.dragImage.startClientX) * scaleX);
+      el.imageY.value = Math.round(state.dragImage.startY + (evt.clientY - state.dragImage.startClientY) * scaleY);
+      resetEdits(); scheduleUpdate(); return;
     }
+    var pos = pointerCell(evt);
+    if (pos) { state.pointer.visible = true; state.pointer.col = pos.col; state.pointer.row = pos.row; if (state.previewData) drawPreview(state.previewData); }
     if (evt.buttons) editAtEvent(evt);
   });
   el.preview.addEventListener('pointerup', function (evt) {
     if (state.dragImage && state.dragImage.pointerId === evt.pointerId) state.dragImage = null;
+    if (state.panDrag && state.panDrag.id===evt.pointerId) state.panDrag=null;
     if (el.eraserEnabled.checked && state.currentStroke && state.currentStroke.length) state.actionHistory.push(state.currentStroke);
     state.currentStroke = null;
   });
@@ -1041,15 +875,11 @@
 
   el.undoErase.addEventListener('click', function () {
     var changed = state.eraseHistory.pop();
-    if (changed && state.eraseMask) {
-      changed.forEach(function (cell) { state.eraseMask[cell[0]][cell[1]] = cell[2]; });
-      scheduleUpdate();
-    }
+    if (changed && state.eraseMask) { changed.forEach(function (cell) { state.eraseMask[cell[0]][cell[1]] = cell[2]; }); scheduleUpdate(); }
   });
 
   el.undoAction.addEventListener('click', function () {
-    var action = state.actionHistory.pop();
-    if (!action || !state.eraseMask) return;
+    var action = state.actionHistory.pop(); if (!action || !state.eraseMask) return;
     for (var i = action.length - 1; i >= 0; i--) {
       var changed = action[i];
       for (var j = 0; j < changed.length; j++) state.eraseMask[changed[j][0]][changed[j][1]] = changed[j][2];
@@ -1061,20 +891,20 @@
   el.centerImage.addEventListener('click', function () {
     if (!state.image) return;
     var fit = Math.min(1, options().previewWidth / state.sourceCanvas.width, options().previewHeight / state.sourceCanvas.height);
-    el.imageScale.value = fit;
-    el.imageScaleNum.value = fit.toFixed(2);
+    el.imageScale.value = fit; el.imageScaleNum.value = fit.toFixed(2);
     el.imageX.value = Math.round((options().previewWidth - state.sourceCanvas.width * fit) / 2);
     el.imageY.value = Math.round((options().previewHeight - state.sourceCanvas.height * fit) / 2);
-    resetEdits();
-    scheduleUpdate();
+    resetEdits(); scheduleUpdate();
   });
-  el.clearErase.addEventListener('click', function () {
-    resetEdits();
-    scheduleUpdate();
-  });
+  el.clearErase.addEventListener('click', function () { resetEdits(); scheduleUpdate(); });
 
   el.file.addEventListener('change', function () {
-    if (el.file.files && el.file.files[0]) loadImage(el.file.files[0]);
+    if (!(el.file.files&&el.file.files.length)) return;
+    var files=Array.from(el.file.files);
+    state.multiImages=[];
+    files.forEach(function(f,idx){ state.multiImages.push({file:f,enabled:true,index:idx+1});});
+    loadImage(files[0]);
+    el.downloadMultiAeJsx.disabled = !(el.multiFiles.checked && files.length>1);
   });
   el.downloadJson.addEventListener('click', function () {
     if (state.lottieText) downloadBlob(new Blob([state.lottieText], { type: 'application/json' }), state.imageName + '_afterdither.json');
@@ -1088,8 +918,30 @@
       el.note.textContent = 'AE JSX скопирован. В After Effects: File > Scripts > Run Script File или вставь в ExtendScript runner.';
     });
   });
+
+  syncRange(el.viewportZoom, el.viewportZoomNum);
+  document.querySelectorAll('[data-reset]').forEach(function(btn){btn.addEventListener('click',function(){
+    var map={pixelSize:['pixelSize','pixelSizeNum',8],pixelGap:['pixelGap','pixelGapNum',0],brightness:['brightness','brightnessNum',0],contrast:['contrast','contrastNum',0],threshold:['threshold','thresholdNum',50],previewSize:['previewWidth','previewHeight',512],imagePos:['imageX','imageY',0],imageScale:['imageScale','imageScaleNum',1]};
+    var k=btn.getAttribute('data-reset'),m=map[k]; if(!m)return;
+    if(k==='previewSize'){el[m[0]].value=512;el[m[1]].value=512;} else if(k==='imagePos'){el[m[0]].value=0;el[m[1]].value=0;} else {el[m[0]].value=m[2];el[m[1]].value=m[2];}
+    resetEdits(); scheduleUpdate();
+  });});
+  el.toolArrow.addEventListener('click',function(){state.activeTool='arrow'; setToolButtons();});
+  el.toolHand.addEventListener('click',function(){state.activeTool='hand'; setToolButtons();});
+  window.addEventListener('keydown',function(e){if(e.code==='Space'){ e.preventDefault(); state.spaceHand=true; setToolButtons(); }});
+  window.addEventListener('keyup',function(e){if(e.code==='Space'){ state.spaceHand=false; setToolButtons(); }});
+  el.viewportZoom.addEventListener('input',function(){state.viewZoom=readNumber(el.viewportZoom.value,1); el.viewportZoomNum.value=state.viewZoom.toFixed(2); applyViewportTransform();});
+  el.viewportZoomNum.addEventListener('input',function(){state.viewZoom=clamp(readNumber(el.viewportZoomNum.value,1),0.25,8); el.viewportZoom.value=state.viewZoom; applyViewportTransform();});
+  el.viewportWrap.addEventListener('wheel',function(e){e.preventDefault(); var prev=state.viewZoom; var z=clamp(prev+(e.deltaY<0?0.1:-0.1),0.25,8); state.viewZoom=z; el.viewportZoom.value=z; el.viewportZoomNum.value=z.toFixed(2); applyViewportTransform();});
   el.downloadAeJsx.addEventListener('click', function () {
     if (state.aeJsxText) downloadBlob(new Blob([state.aeJsxText], { type: 'text/javascript' }), state.imageName + '_afterdither_ae.jsx');
+  });
+  setToolButtons();
+  applyViewportTransform();
+  el.multiFiles.addEventListener('change',function(){ el.file.multiple = !!el.multiFiles.checked; });
+  el.downloadMultiAeJsx.addEventListener('click', function(){
+    if(!el.multiFiles.checked||!state.multiImages.length||!state.aeJsxText) return;
+    state.multiImages.forEach(function(item,idx){ if(!item.enabled) return; var nm=baseName(item.file.name)+(idx+1)+'_'+(idx+1)+'.jsx'; downloadBlob(new Blob([state.aeJsxText],{type:'text/javascript'}),nm);});
   });
 }());
 </script>
